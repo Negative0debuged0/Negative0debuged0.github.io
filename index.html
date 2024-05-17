@@ -3,129 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Negative0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Music Section</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a;
-            color: #eaeaea;
-        }
-        .navbar {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            background: linear-gradient(90deg, #333, #444);
-            padding: 1em 2em;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .navbar a {
-            color: #eaeaea;
-            padding: 10px 15px;
-            text-decoration: none;
-            text-align: center;
-            position: relative;
-            transition: color 0.3s, transform 0.3s;
-        }
-        .navbar a::before {
-            content: '';
-            position: absolute;
-            width: 0%;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: #ff6347;
-            transition: width 0.3s;
-        }
-        .navbar a:hover {
-            color: #ff6347;
-            transform: translateY(-2px);
-        }
-        .navbar a:hover::before {
-            width: 100%;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #333;
-            min-width: 180px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
-            z-index: 1;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .dropdown-content a {
-            color: #eaeaea;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .dropdown-content a:hover {
-            background-color: #ff6347;
+            background: linear-gradient(135deg, #b3e5fc, #0d47a1); /* Gradient background */
             color: #fff;
         }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .footer {
-            background-color: #222;
-            color: white;
-            text-align: center;
-            padding: 1em 0;
-            position: fixed;
+
+        header {
+            background: linear-gradient(135deg, #1565c0, #0d47a1); /* Gradient header */
+            color: #fff;
+            padding: 20px;
             width: 100%;
-            bottom: 0;
-            font-size: 0.9em;
-            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
-        .footer a {
-            color: #ff6347;
+
+        nav {
+            background-color: #64B5F6; /* Lighter blue for navigation */
+            padding: 10px 20px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        nav a {
+            margin: 0 15px;
             text-decoration: none;
+            color: #fff;
+            font-weight: 500;
         }
-        .footer a:hover {
-            text-decoration: underline;
+
+        nav a:hover {
+            color: #ccc;
+        }
+
+        .music-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .music-iframe {
+            width: 45%;
+            max-width: 600px;
+            height: 400px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
-<div class="navbar">
-    <a href="">Home</a>
-    <a href="https://negative0debuged0.github.io/Negative0Web/About">About</a>
-    <div class="dropdown">
-        <a href="https://negative0debuged0.github.io/Negative0Web/Socials">Socials</a>
-        <div class="dropdown-content">
-            <a href="https://www.youtube.com/channel/UCTWn1tUqbSNLrCLyunHnlcA">Youtube</a>
-            <a href="https://steamcommunity.com/id/-Negative0_Debuged0/">Steam</a>
-            <a href="https://discord.gg/kQfVYQuJGt">Discord Server</a>
-        </div>
-    </div>
-    <a href="https://negative0debuged0.github.io/Negative0Web/Music">Music</a>
-    <a href="https://negative0debuged0.github.io/Negative0Web/FAQ">FAQ</a>
-    <a href="https://negative0debuged0.github.io/Negative0Web/Password">Admin Panel</a>
-</div>
+<header>
+    <h1>Music Section</h1>
+</header>
 
-<!-- Add your content here -->
+<nav>
+    <a href="https://negative0debuged0.github.io/Negative0Web">Home</a>
+    <a href="about.html">About</a>
+</nav>
 
-<div class="footer">
-    &copy; 2024 Negative0. All rights reserved. | <a href="#privacy-policy">Privacy Policy</a> | <a href="#terms-of-service">Terms of Service</a>
-    <br>
-    Follow us: 
-    <a href="https://twitter.com/negative0">Twitter</a> | 
-    <a href="https://facebook.com/negative0">Facebook</a> | 
-    <a href="https://instagram.com/negative0">Instagram</a>
+<div class="music-container">
+    <!-- First music -->
+    <iframe class="music-iframe" src="https://www.youtube.com/embed/eAQmGECNQuQ" title="Fishy friend (final version)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    
+    <!-- Second music -->
+    <iframe class="music-iframe" src="https://www.youtube.com/embed/WcfeFQAvp1g" title="Undertale AU Style Music" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </div>
 
 </body>
 </html>
+
