@@ -3,161 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Negative0's Realm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet"> <!-- Add Cabin font -->
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <title>Negative0</title>
     <style>
         body {
-            font-family: 'Cabin', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
         }
-
-        header {
-            background-color: #222;
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 1em;
+        }
+        .navbar a {
             color: #fff;
-            padding: 20px;
+            padding: 14px 20px;
+            text-decoration: none;
             text-align: center;
         }
-
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+        .navbar a:hover {
+            background-color: #575757;
         }
-
-        nav ul li {
-            display: inline;
-            margin-right: 20px;
+        .dropdown {
+            position: relative;
+            display: inline-block;
         }
-
-        nav ul li a {
-            color: #fff;
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
             text-decoration: none;
+            display: block;
+            text-align: left;
         }
-
-        main {
-            padding: 20px;
+        .dropdown-content a:hover {
+            background-color: #575757;
         }
-
-        section {
-            margin-bottom: 30px;
+        .dropdown:hover .dropdown-content {
+            display: block;
         }
-
-        h2 {
-            color: #333;
-        }
-
-        #comment-form {
-            margin-top: 20px;
-        }
-
-        #comment-text {
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            position: fixed;
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        #comment-form button {
-            background-color: #222;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
-
-        #comments-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .comment {
-            margin-bottom: 10px;
-        }
-
-        .comment p {
-            margin: 0;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            bottom: 0;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Negative0's Realm</h1>
-    <nav>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="music.html">Music</a></li>
-        </ul>
-    </nav>
-</header>
-
-<main>
-    <section id="home">
-        <h2>Negative0's BIO</h2>
-        <p>negativity controlling me 0 being a part of me call me negative0 the broken/glitched thing
-i have an enemy called positive0</p>
-<p>enemy:positive0</p>
-<p>name:-negative0</p>
-    </section>
-
-    <section id="comments">
-        <h2>Comments</h2>
-        <div id="comments-container">
-            <!-- Comments will be dynamically added here -->
+<div class="navbar">
+    <a href="#home">Home</a>
+    <a href="#about">About Us</a>
+    <div class="dropdown">
+        <a href="#services">Services</a>
+        <div class="dropdown-content">
+            <a href="#web-development">Web Development</a>
+            <a href="#app-development">App Development</a>
+            <a href="#digital-marketing">Digital Marketing</a>
+            <a href="#consulting">Consulting</a>
         </div>
-        <form id="comment-form">
-            <textarea id="comment-text" placeholder="Write your comment here..." required></textarea>
-            <button type="submit">Comments dont work right now</button>
-        </form>
-    </section>
-</main>
+    </div>
+    <a href="#portfolio">Portfolio</a>
+    <a href="#blog">Blog</a>
+    <a href="#contact">Contact Us</a>
+    <a href="#faq">FAQ</a>
+    <a href="#testimonials">Testimonials</a>
+    <a href="#careers">Careers</a>
+    <a href="#shop">Shop</a>
+    <a href="#support">Support</a>
+</div>
 
-<footer>
-    <!-- Footer content -->
-</footer>
+<!-- Add your content here -->
 
-<!-- Scripts for comments functionality -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery -->
-<script>
-    // Function to load comments from server
-    function loadComments() {
-        $.ajax({
-            url: 'load_comments.php', // Replace with your server-side script URL
-            type: 'GET',
-            success: function(data) {
-                $('#comments-container').html(data);
-            }
-        });
-    }
+<div class="footer">
+    &copy; 2024 Negative0. All rights reserved. | <a href="#privacy-policy" style="color:white;">Privacy Policy</a> | <a href="#terms-of-service" style="color:white;">Terms of Service</a>
+    <br>
+    Follow us: 
+    <a href="https://twitter.com/negative0" style="color:white;">Twitter</a> | 
+    <a href="https://facebook.com/negative0" style="color:white;">Facebook</a> | 
+    <a href="https://instagram.com/negative0" style="color:white;">Instagram</a>
+</div>
 
-    // Load comments on page load
-    $(document).ready(function() {
-        loadComments();
-    });
-
-    // Submit comment via AJAX
-    $('#comment-form').submit(function(e) {
-        e.preventDefault();
-        var commentText = $('#comment-text').val();
-        $.ajax({
-            url: 'submit_comment.php', // Replace with your server-side script URL
-            type: 'POST',
-            data: { comment: commentText },
-            success: function() {
-                $('#comment-text').val('');
-                loadComments(); // Reload comments after submitting
-            }
-        });
-    });
-</script>
 </body>
 </html>
+
