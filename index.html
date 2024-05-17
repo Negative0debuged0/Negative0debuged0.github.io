@@ -10,28 +10,44 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #1a1a1a;
+            color: #eaeaea;
         }
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #222;
+            background: linear-gradient(90deg, #333, #444);
             padding: 1em 2em;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .navbar a {
-            color: #fff;
+            color: #eaeaea;
             padding: 10px 15px;
             text-decoration: none;
             text-align: center;
-            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+            transition: color 0.3s, transform 0.3s;
+        }
+        .navbar a::before {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ff6347;
+            transition: width 0.3s;
         }
         .navbar a:hover {
-            background-color: #ff6347;
-            color: #fff;
+            color: #ff6347;
+            transform: translateY(-2px);
+        }
+        .navbar a:hover::before {
+            width: 100%;
         }
         .dropdown {
             position: relative;
@@ -40,13 +56,15 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #222;
+            background-color: #333;
             min-width: 180px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
             z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
         }
         .dropdown-content a {
-            color: white;
+            color: #eaeaea;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
@@ -69,6 +87,7 @@
             width: 100%;
             bottom: 0;
             font-size: 0.9em;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
         }
         .footer a {
             color: #ff6347;
@@ -82,7 +101,7 @@
 <body>
 
 <div class="navbar">
-    <a href="#home">Home</a>
+    <a href="">Home</a>
     <a href="#about">About Us</a>
     <div class="dropdown">
         <a href="#services">Services</a>
@@ -99,7 +118,7 @@
     <a href="#faq">FAQ</a>
     <a href="#testimonials">Testimonials</a>
     <a href="#careers">Careers</a>
-    <a href="#shop">Shop</a>
+    <a href="https://negative0debuged0.github.io/Negative0Web/Password/">Admin Panel</a>
     <a href="#support">Support</a>
 </div>
 
