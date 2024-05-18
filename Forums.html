@@ -17,8 +17,8 @@
         }
         .navbar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
             background: linear-gradient(90deg, #006400, #00FFFF); /* Gradient navbar: dark green to light aqua */
             padding: 1em 2em;
             width: 100%;
@@ -34,6 +34,14 @@
             text-align: center;
             position: relative;
             transition: color 0.3s, transform 0.3s;
+            font-size: 0.9em; /* Adjust font size */
+            margin-right: 1em; /* Add margin to space out the links */
+        }
+        .navbar h1 {
+            font-size: 1.2em; /* Adjust font size */
+            margin: 0;
+            padding: 0 1em;
+            color: #eaeaea;
         }
         .navbar a::before {
             content: '';
@@ -69,7 +77,7 @@
 
 <div class="navbar">
     <a href="https://negative0debuged0.github.io/">Home</a>
-    <h1> Join the discord for the best experience </h1>
+    <h1>Join the discord for the best experience</h1>
 </div>
 
 <div class="discord-widget">
@@ -82,3 +90,4 @@
 <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
 </body>
 </html>
+
