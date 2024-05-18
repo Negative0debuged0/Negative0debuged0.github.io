@@ -67,7 +67,6 @@
 
         let bird = new Image();
         bird.src = "https://via.placeholder.com/50"; // Default placeholder image
-
         let birdX = 50;
         let birdY = 150;
         let birdWidth = 50;
@@ -75,17 +74,17 @@
         let gravity = 0.6;
         let lift = -15;
         let velocity = 0;
-
         let pipes = [];
         let frameCount = 0;
         let gameStarted = false;
+        let birdImageSrc = bird.src;
 
         document.addEventListener("keydown", () => {
             if (!gameStarted) {
                 gameStarted = true;
                 loop();
             }
-            velocity += lift;
+            velocity = lift;
         });
 
         document.getElementById("imageUpload").addEventListener("change", function(event) {
@@ -94,6 +93,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     bird.src = e.target.result;
+                    birdImageSrc = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
@@ -146,10 +146,19 @@
             return birdY + birdHeight > canvas.height || birdY < 0;
         }
 
+        function resetGame() {
+            birdY = 150;
+            velocity = 0;
+            pipes = [];
+            frameCount = 0;
+            bird.src = birdImageSrc; // Reset bird image
+        }
+
         function loop() {
             if (detectCollision()) {
                 alert("Game Over!");
-                document.location.reload();
+                resetGame();
+                gameStarted = false;
                 return;
             }
 
@@ -162,10 +171,13 @@
             birdY += velocity;
 
             frameCount++;
-            requestAnimationFrame(loop);
+            if (gameStarted) {
+                requestAnimationFrame(loop);
+            }
         }
 
         drawBird();
     </script>
 </body>
 </html>
+
