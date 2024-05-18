@@ -80,6 +80,33 @@
         .panel-section button:active {
             transform: scale(0.98);
         }
+
+        /* User Information Styling */
+        .user-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .user-info-table th, .user-info-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #fff;
+        }
+
+        .user-info-table th {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .user-info-table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -87,30 +114,34 @@
         <h2>Admin Panel</h2>
 
         <div class="panel-section">
-            <h3>Section 1: User Management</h3>
-            <p>Manage users here. Add, remove, or update user information.</p>
-            <input type="text" placeholder="Search users...">
-            <button>Search</button>
-        </div>
-
-        <div class="panel-section">
-            <h3>Section 2: Content Management</h3>
-            <p>Edit website content here. Update text, images, and more.</p>
-            <textarea rows="4" placeholder="Enter new content..."></textarea>
-            <button>Update Content</button>
-        </div>
-
-        <div class="panel-section">
-            <h3>Section 3: Settings</h3>
-            <p>Update website settings here.</p>
-            <select>
-                <option value="option1">Setting 1</option>
-                <option value="option2">Setting 2</option>
-                <option value="option3">Setting 3</option>
-            </select>
-            <button>Save Settings</button>
+            <h3>User Information</h3>
+            <p>View information about website users.</p>
+            <table class="user-info-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Operating System</th>
+                        <th>Browser</th>
+                        <th>Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Windows 10</td>
+                        <td>Chrome</td>
+                        <td>2024-05-25 10:30:00</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>macOS Big Sur</td>
+                        <td>Safari</td>
+                        <td>2024-05-25 11:15:00</td>
+                    </tr>
+                    <!-- Add more user data rows as needed -->
+                </tbody>
+            </table>
         </div>
     </div>
 </body>
 </html>
-
