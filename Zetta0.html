@@ -130,6 +130,7 @@
                         <th>Session Duration</th>
                         <th>User Actions</th>
                         <th>Visit Time</th>
+                        <th>IP Address</th>
                     </tr>
                 </thead>
                 <tbody id="user-info-body">
@@ -141,7 +142,7 @@
 
     <script>
         // Function to get user information
-        function getUserInfo() {
+        async function getUserInfo() {
             // Get user agent information
             const userAgent = navigator.userAgent;
             const os = getOS(userAgent);
@@ -152,6 +153,11 @@
             const referrerURL = document.referrer;
             const visitTime = new Date().toLocaleString();
 
+            // Fetch IP address using ipify
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            const ipAddress = ipData.ip;
+
             // Generate random username for demonstration
             const username = `User${Math.floor(Math.random() * 1000)}`;
             // Generate random session duration for demonstration (in minutes)
@@ -159,10 +165,10 @@
             // Random user actions for demonstration
             const userActions = ['Clicked on homepage', 'Visited about page', 'Submitted contact form'];
 
-            return { username, os, browser, language, deviceType, screenResolution, referrerURL, sessionDuration, userActions, visitTime };
+            return { username, os, browser, language, deviceType, screenResolution, referrerURL, sessionDuration, userActions, visitTime, ipAddress };
         }
 
-        // Function to get operating system from user agent
+               // Function to get operating system from user agent
         function getOS(userAgent) {
             let os = "Unknown";
             if (userAgent.match(/Windows/i)) {
@@ -175,22 +181,22 @@
             return os;
         }
 
-      // Function to get browser from user agent
-function getBrowser(userAgent) {
-    let browser = "Unknown";
-    if (userAgent.match(/Firefox/i)) {
-        browser = "Firefox";
-    } else if (userAgent.match(/Chrome/i)) {
-        browser = "Chrome";
-    } else if (userAgent.match(/Safari/i)) {
-        browser = "Safari";
-    } else if (userAgent.match(/Opera|OPR\//i)) {
-        browser = "Opera";
-    } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
-        browser = "Internet Explorer";
-    }
-    return browser; // Removed line break here
-}
+        // Function to get browser from user agent
+        function getBrowser(userAgent) {
+            let browser = "Unknown";
+            if (userAgent.match(/Firefox/i)) {
+                browser = "Firefox";
+            } else if (userAgent.match(/Chrome/i)) {
+                browser = "Chrome";
+            } else if (userAgent.match(/Safari/i)) {
+                browser = "Safari";
+            } else if (userAgent.match(/Opera|OPR\//i)) {
+                browser = "Opera";
+            } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
+                browser = "Internet Explorer";
+            }
+            return browser;
+        }
 
         // Function to get device type
         function getDeviceType() {
@@ -198,8 +204,8 @@ function getBrowser(userAgent) {
         }
 
         // Function to display user information in table
-        function displayUserInfo() {
-            const userInfo = getUserInfo();
+        async function displayUserInfo() {
+            const userInfo = await getUserInfo();
             const userInfoBody = document.getElementById('user-info-body');
             const newRow = userInfoBody.insertRow();
 
@@ -215,6 +221,7 @@ function getBrowser(userAgent) {
                 <td>${userInfo.sessionDuration} mins</td>
                 <td>${userInfo.userActions.join('<br>')}</td>
                 <td>${userInfo.visitTime}</td>
+                <td>${userInfo.ipAddress}</td>
             `;
         }
 
