@@ -125,23 +125,74 @@
                         <th>Visit Time</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Windows 10</td>
-                        <td>Chrome</td>
-                        <td>2024-05-25 10:30:00</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>macOS Big Sur</td>
-                        <td>Safari</td>
-                        <td>2024-05-25 11:15:00</td>
-                    </tr>
-                    <!-- Add more user data rows as needed -->
+                <tbody id="user-info-body">
+                    <!-- User data will be dynamically populated here -->
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        // Function to get user information
+        function getUserInfo() {
+            // Get user agent information
+            const userAgent = navigator.userAgent;
+            const os = getOS(userAgent);
+            const browser = getBrowser(userAgent);
+
+            // Get visit time
+            const visitTime = new Date().toLocaleString();
+
+            return { os, browser, visitTime };
+        }
+
+        // Function to get operating system from user agent
+        function getOS(userAgent) {
+            let os = "Unknown";
+            if (userAgent.match(/Windows/i)) {
+                os = "Windows";
+            } else if (userAgent.match(/Macintosh/i)) {
+                os = "macOS";
+            } else if (userAgent.match(/Linux/i)) {
+                os = "Linux";
+            }
+            return os;
+        }
+
+        // Function to get browser from user agent
+        function getBrowser(userAgent) {
+            let browser = "Unknown";
+            if (userAgent.match(/Firefox/i)) {
+                browser = "Firefox";
+            } else if (userAgent.match(/Chrome/i)) {
+                browser = "Chrome";
+            } else if (userAgent.match(/Safari/i)) {
+                browser = "Safari";
+            } else if (userAgent.match(/Opera|OPR\//i)) {
+                browser = "Opera";
+            } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
+                browser = "Internet Explorer";
+            }
+            return browser;
+        }
+
+        // Function to display user information in table
+        function displayUserInfo() {
+            const userInfo = getUserInfo();
+            const userInfoBody = document.getElementById('user-info-body');
+            const newRow = userInfoBody.insertRow();
+
+            newRow.innerHTML = `
+                <td>${Math.floor(Math.random() * 1000)}</td>
+                <td>${userInfo.os}</td>
+                <td>${userInfo.browser}</td>
+                <td>${userInfo.visitTime}</td>
+            `;
+        }
+
+        // Call function to display user information
+        displayUserInfo();
+    </script>
 </body>
 </html>
+
