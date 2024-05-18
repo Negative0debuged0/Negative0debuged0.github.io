@@ -51,7 +51,7 @@
 </head>
 <body>
     <header>
-        <h1>Flappy Bird with Custom Character</h1>
+        <h1>Flappy Bird with Custom Character Use Chrome for a better experience</h1>
     </header>
     
     <div id="uploadContainer">
@@ -71,8 +71,8 @@
         let birdY = 150;
         let birdWidth = 50;
         let birdHeight = 50;
-        let gravity = 0.25;
-        let lift = -7;
+        let gravity = 0.5;
+        let lift = -10;
         let velocity = 0;
         let pipes = [];
         let frameCount = 0;
@@ -111,14 +111,14 @@
             pipes.forEach(pipe => {
                 ctx.fillStyle = "#8B4513"; // Brown color for pipes
                 ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
-                ctx.fillRect(pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
             });
         }
 
         function updatePipes() {
             if (frameCount % 90 === 0) {
                 const pipeWidth = 50;
-                const pipeGap = 200; // Increased gap between pipes
+                const pipeGap = 150;
                 const pipeTopHeight = Math.floor(Math.random() * (canvas.height - pipeGap));
                 const pipeBottomHeight = canvas.height - pipeGap - pipeTopHeight;
 
@@ -142,7 +142,7 @@
                 if (
                     birdX < pipe.x + pipe.width &&
                     birdX + birdWidth > pipe.x &&
-                    (birdY < pipe.top || birdY + birdHeight > pipe.bottom)
+                    (birdY < pipe.top || birdY + birdHeight > canvas.height - pipe.bottom)
                 ) {
                     return true;
                 }
@@ -155,7 +155,7 @@
             velocity = 0;
             pipes = [];
             frameCount = 0;
-            bird.src = birdImageSrc;
+            bird.src = birdImageSrc; // Reset bird image
         }
 
         function loop() {
@@ -184,4 +184,5 @@
     </script>
 </body>
 </html>
+
 
