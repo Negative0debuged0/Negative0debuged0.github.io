@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #6A0DAD, #1E90FF); /* Gradient background: purple to blue */
+            color: #fff;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4B0082, #00BFFF); /* Gradient header: darker purple to lighter blue */
+            color: #fff;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .games-container {
+            max-width: 800px;
+            width: 90%;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .game {
+            margin-bottom: 20px;
+        }
+
+        .game iframe {
+            width: 100%;
+            max-width: 800px;
+            height: 450px; /* Adjust the height as needed */
+            margin: 0 auto;
+            display: block;
+            border: none;
+        }
+
+        .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFD700; /* Gold color for game titles */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Games Page</h1>
+</header>
+
+<div class="games-container">
+    <div class="game">
+        <div class="game-title">Game 1: Example Game</div>
+        <iframe src="https://example.com/game1" title="Game 1"></iframe>
+    </div>
+    <div class="game">
+        <div class="game-title">Game 2: Example Game</div>
+        <iframe src="https://example.com/game2" title="Game 2"></iframe>
+    </div>
+    <!-- Add more games as needed -->
+</div>
+
+</body>
+</html>
