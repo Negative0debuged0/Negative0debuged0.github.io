@@ -148,15 +148,19 @@
             const os = getOS(userAgent);
             const browser = getBrowser(userAgent);
             const language = navigator.language;
-            const deviceType = getDeviceType();
+            const deviceType             = getDeviceType();
             const screenResolution = `${window.screen.width}x${window.screen.height}`;
             const referrerURL = document.referrer;
             const visitTime = new Date().toLocaleString();
-
-            // Fetch IP address using ipify
-            const ipResponse = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipResponse.json();
-            const ipAddress = ipData.ip;
+            
+            // Get IP address using an API
+            const ipAddress = await fetch('https://api64.ipify.org?format=json')
+                                  .then(response => response.json())
+                                  .then(data => data.ip)
+                                  .catch(error => {
+                                      console.error('Error fetching IP address:', error);
+                                      return 'N/A';
+                                  });
 
             // Generate random username for demonstration
             const username = `User${Math.floor(Math.random() * 1000)}`;
@@ -168,7 +172,7 @@
             return { username, os, browser, language, deviceType, screenResolution, referrerURL, sessionDuration, userActions, visitTime, ipAddress };
         }
 
-               // Function to get operating system from user agent
+        // Function to get operating system from user agent
         function getOS(userAgent) {
             let os = "Unknown";
             if (userAgent.match(/Windows/i)) {
@@ -204,7 +208,7 @@
         }
 
         // Function to display user information in table
-        async function displayUserInfo() {
+        function displayUserInfo() {
             const userInfo = await getUserInfo();
             const userInfoBody = document.getElementById('user-info-body');
             const newRow = userInfoBody.insertRow();
@@ -230,3 +234,4 @@
     </script>
 </body>
 </html>
+
