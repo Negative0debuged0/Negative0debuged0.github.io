@@ -3,178 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forum</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Negative0's Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(to bottom, #006400, #00FFFF); /* Vertical gradient: dark green to light aqua */
-            color: #fff;
+            background: linear-gradient(135deg, #FF0000, #000000); /* Gradient background: red to black */
+            color: #eaeaea;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             flex-direction: column;
+            align-items: center;
         }
-
-        .forum-panel {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 80%;
-            max-width: 1000px;
-            margin-bottom: 20px;
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, #800000, #000000); /* Gradient navbar: dark red to black */
+            padding: 1em 2em;
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-
-        h2 {
-            margin-bottom: 20px;
-            font-weight: 500;
+        .navbar a {
+            color: #eaeaea;
+            padding: 10px 15px;
+            text-decoration: none;
             text-align: center;
+            position: relative;
+            transition: color 0.3s, transform 0.3s;
         }
-
-        .forum-section {
-            margin-bottom: 20px;
+        .navbar a::before {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ff6347;
+            transition: width 0.3s;
         }
-
-        .forum-section h3 {
-            margin-bottom: 10px;
-            font-weight: 400;
-            border-bottom: 2px solid #4caf50;
-            padding-bottom: 5px;
+        .navbar a:hover {
+            color: #ff6347;
+            transform: translateY(-2px);
         }
-
-        .forum-section p {
-            margin: 0 0 10px;
-        }
-
-        .forum-section input, .forum-section textarea, .forum-section select {
+        .navbar a:hover::before {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            outline: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
         }
-
-        .forum-section button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4caf50;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.5);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .dropdown-content a {
+            color: #eaeaea;
+            padding: 12px 16px;
+            text-decoration: none;
             display: block;
-            margin: 10px auto;
-        }
-
-        .forum-section button:hover {
-            background-color: #45a049;
-        }
-
-        .forum-section button:active {
-            transform: scale(0.98);
-        }
-
-        /* Forum Styling */
-        .forum-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .forum-table th, .forum-table td {
-            padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dropdown-content a:hover {
+            background-color: #ff6347;
             color: #fff;
         }
-
-        .forum-table th {
-            background-color: #4caf50;
-            color: #fff;
+        .dropdown:hover .dropdown-content {
+            display: block;
         }
-
-        .forum-table tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.1);
+        .footer {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            width: 100%;
+            font-size: 0.9em;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            bottom: 0;
         }
-
-        .forum-table tr:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+        .footer a {
+            color: #ff6347;
+            text-decoration: none;
         }
-
-        /* Discord Widget Styling */
-        .discord-widget {
-            width: 80%;
-            max-width: 1000px;
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="forum-panel">
-        <h2>Forum</h2>
 
-        <div class="forum-section">
-            <h3>Create a New Topic</h3>
-            <form id="create-topic-form">
-                <input type="text" id="topic-title" placeholder="Topic Title" required>
-                <textarea id="topic-content" placeholder="Topic Content" rows="5" required></textarea>
-                <button type="submit">Post Topic</button>
-            </form>
-        </div>
-
-        <div class="forum-section">
-            <h3>Topics</h3>
-            <table class="forum-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Replies</th>
-                        <th>Last Post</th>
-                    </tr>
-                </thead>
-                <tbody id="forum-topics-body">
-                    <!-- Topics will be dynamically populated here -->
-                </tbody>
-            </table>
+<div class="navbar">
+    <a href="">Home</a>
+    <a href="https://negative0debuged0.github.io/Negative0Web/About">About Us</a>
+    <div class="dropdown">
+        <a href="">Socials</a>
+        <div class="dropdown-content">
+            <a href="https://www.youtube.com/channel/UCTWn1tUqbSNLrCLyunHnlcA">Youtube</a>
+            <a href="https://steamcommunity.com/id/-Negative0_Debuged0/">Steam</a>
+            <a href="https://discord.gg/kQfVYQuJGt">Discord server</a>
         </div>
     </div>
+    <a href="https://negative0debuged0.github.io/Negative0Web/Music">Music</a>
+    <a href="https://negative0debuged0.github.io/Negative0Web/Faq">FAQ</a>
+    <a href="javascript:getUserInfo()">Admin panel</a> <!-- Call JavaScript function -->
+    <a href="https://negative0debuged0.github.io/Negative0Web/Games">Games</a>
+</div>
 
-    <div class="discord-widget">
-        <iframe src="https://discord.com/widget?id=1241138802970333226&theme=dark" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
-    </div>
+<script>
+    function getUserInfo() {
+        // Gather user information
+        const userInfo = {
+            user: 'User1', // Example user
+            country: 'Country1', // Example country
+            deviceType: 'Desktop', // Example device type
+            language: navigator.language, // User's browser language
+            googleAccount: 'GoogleAccount1', // Example Google account name
+            screenResolution: `${window.screen.width}x${window.screen.height}`, // User's screen resolution
+            referrerURL: document.referrer, // Referrer URL
+            pagesVisited: window.location.href, // Pages visited
+            OS: getOS(navigator.userAgent), // User's operating system
+            browser: getBrowser(navigator.userAgent) // User's browser
+        };
 
-    <script>
-        document.getElementById('create-topic-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const title = document.getElementById('topic-title').value;
-            const content = document.getElementById('topic-content').value;
-            const author = 'User' + Math.floor(Math.random() * 1000); // Replace with actual user logic
-            const replies = 0;
-            const lastPost = new Date().toLocaleString();
+        // Function to get operating system from user agent
+        function getOS(userAgent) {
+            let os = "Unknown";
+            if (userAgent.match(/Windows/i)) {
+                os = "Windows";
+            } else if (userAgent.match(/Macintosh/i)) {
+                os = "macOS";
+            } else if (userAgent.match(/Linux/i)) {
+                os = "Linux";
+            }
+            return os;
+        }
 
-            const forumTopicsBody = document.getElementById('forum-topics-body');
-            const newRow = forumTopicsBody.insertRow();
+        // Function to get browser from user agent
+        function getBrowser(userAgent) {
+            let browser = "Unknown";
+            if (userAgent.match(/Firefox/i)) {
+                browser = "Firefox";
+            } else if (userAgent.match(/Chrome/i)) {
+                browser = "Chrome";
+            } else if (userAgent.match(/Safari/i)) {
+                browser = "Safari";
+            } else if (userAgent.match(/Opera|OPR\//i)) {
+                browser = "Opera";
+            } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
+                browser = "Internet Explorer";
+            }
+            return browser;
+        }
 
-            newRow.innerHTML = `
-                <td>${title}</td>
-                <td>${author}</td>
-                <td>${replies}</td>
-                <td>${lastPost}</td>
-            `;
+        // Save user information to a text file
+        saveToFile(JSON.stringify(userInfo));
+    }
 
-            // Clear the form
-            document.getElementById('create-topic-form').reset();
-        });
-    </script>
+    // Function to save data to a text file
+    function saveToFile(data) {
+        const fileName = `${userInfo.googleAccount}.txt`; // File name based on Google account name
+        const blob = new Blob([data], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+    }
+</script>
+
 </body>
 </html>
