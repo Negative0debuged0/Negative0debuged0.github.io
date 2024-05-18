@@ -9,21 +9,32 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a; /* dark grey */
-            color: #8b0000; /* dark red */
+            background: linear-gradient(135deg, #00FF00, #0000FF); /* Gradient background: green to blue */
+            color: #eaeaea; /* light color for contrast */
             text-align: center;
             padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7); /* semi-transparent black background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
         h1 {
             font-size: 36px;
+            margin-bottom: 20px;
+            color: #00FF00; /* green */
         }
         p {
             font-size: 18px;
             line-height: 1.6;
+            margin-bottom: 20px;
         }
         iframe {
             width: 100%;
@@ -31,6 +42,9 @@
             height: 450px; /* Adjust the height as needed */
             margin: 0 auto;
             display: block;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -39,7 +53,8 @@
         <h1>About Negative0</h1>
         <p>On this website, you can currently hear music.</p>
         <p>If you have any suggestions, feel free to comment them on the video.</p>
-        <iframe src="https://www.youtube.com/embed/546hc9J_7RM" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/546hc9J_7RM" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
 </body>
 </html>
+
