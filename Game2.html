@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Craft</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        header, footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        main {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        #elements, #combinations {
+            width: 45%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            cursor: pointer;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            transition: background-color 0.3s ease;
+        }
+
+        li:hover {
+            background-color: #e0e0e0;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Infinite Craft</h1>
+    </header>
+    <main>
+        <div id="elements">
+            <h2>Elements</h2>
+            <ul id="elementList">
+                <li>Air</li>
+                <li>Dirt</li>
+                <li>Water</li>
+                <!-- Add more initial elements here -->
+            </ul>
+        </div>
+        <div id="combinations">
+            <h2>Combinations</h2>
+            <ul id="combinationList">
+                <!-- Combined elements will be added here -->
+            </ul>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Infinite Craft</p>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const elementList = document.getElementById("elementList");
+            const combinationList = document.getElementById("combinationList");
+
+            // Add event listener to element list
+            elementList.addEventListener("click", function(event) {
+                if (event.target.tagName === "LI") {
+                    combineElements(event.target.textContent);
+                }
+            });
+
+            // Function to combine elements
+            function combineElements(element) {
+                const combinedElement = document.createElement("li");
+                combinedElement.textContent = element + " + " + element;
+                combinationList.appendChild(combinedElement);
+            }
+        });
+    </script>
+</body>
+</html>
