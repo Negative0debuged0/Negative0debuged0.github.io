@@ -6,81 +6,220 @@
     <title>Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Your CSS styles here */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1f4037, #99f2c8);
+            color: #fff;
+        }
+
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 80%;
+            max-width: 1000px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .panel-section {
+            margin-bottom: 20px;
+        }
+
+        .panel-section h3 {
+            margin-bottom: 10px;
+            font-weight: 400;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 5px;
+        }
+
+        .panel-section p {
+            margin: 0 0 10px;
+        }
+
+        .panel-section input, .panel-section textarea, .panel-section select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .panel-section button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .panel-section button:hover {
+            background-color: #45a049;
+        }
+
+        .panel-section button:active {
+            transform: scale(0.98);
+        }
+
+        /* User Information Styling */
+        .user-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .user-info-table th, .user-info-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #fff;
+        }
+
+        .user-info-table th {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .user-info-table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
-    <!-- Your HTML content here -->
+    <div class="admin-panel">
+        <h2>Admin Panel</h2>
+
+        <div class="panel-section">
+            <h3>User Information</h3>
+            <p>View information about website users.</p>
+            <table class="user-info-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Operating System</th>
+                        <th>Browser</th>
+                        <th>Language</th>
+                        <th>Device Type</th>
+                        <th>Screen Resolution</th>
+                        <th>Referrer URL</th>
+                        <th>Session Duration</th>
+                        <th>User Actions</th>
+                        <th>Visit Time</th>
+                    </tr>
+                </thead>
+                <tbody id="user-info-body">
+                    <!-- User data will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <script>
-        // Function to send data to the server
-        function sendData(data) {
-            // Use fetch API or AJAX to send data to the server
-            fetch('https://example.com/storeUserData', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                console.log('Data sent successfully');
-            })
-            .catch(error => {
-                console.error('Error sending data:', error);
-            });
+        // Function to get user information
+        function getUserInfo() {
+            // Get user agent information
+            const userAgent = navigator.userAgent;
+            const os = getOS(userAgent);
+            const browser = getBrowser(userAgent);
+            const language = navigator.language;
+            const deviceType = getDeviceType();
+            const screenResolution = `${window.screen.width}x${window.screen.height}`;
+            const referrerURL = document.referrer;
+            const visitTime = new Date().toLocaleString();
+
+            // Generate random username for demonstration
+            const username = `User${Math.floor(Math.random() * 1000)}`;
+            // Generate random session duration for demonstration (in minutes)
+            const sessionDuration = Math.floor(Math.random() * 60) + 1;
+            // Random user actions for demonstration
+            const userActions = ['Clicked on homepage', 'Visited about page', 'Submitted contact form'];
+
+            return { username, os, browser, language, deviceType, screenResolution, referrerURL, sessionDuration, userActions, visitTime };
         }
 
-        // Function to collect and send user data
-        function collectUserData() {
-            // Collect user data here
-            const userData = {
-                sessionDuration: calculateSessionDuration(),
-                pagesVisited: window.location.href,
-                language: navigator.language,
-                deviceType: getDeviceType(),
-                screenResolution: `${window.screen.width}x${window.screen.height}`,
-                userActions: getUserActions(),
-                referrerURL: document.referrer,
-                username: getUsername() // Assuming this function exists to get the username
-            };
-
-            // Send the data to the server
-            sendData(userData);
+        // Function to get operating system from user agent
+        function getOS(userAgent) {
+            let os = "Unknown";
+            if (userAgent.match(/Windows/i)) {
+                os = "Windows";
+            } else if (userAgent.match(/Macintosh/i)) {
+                os = "macOS";
+            } else if (userAgent.match(/Linux/i)) {
+                os = "Linux";
+            }
+            return os;
         }
 
-        // Calculate session duration
-        function calculateSessionDuration() {
-            // Implement your session duration calculation logic here
-            // For example, you can store the session start time when the page loads,
-            // then calculate the difference between the current time and the start time
-            return 'Session duration calculation';
-        }
+      // Function to get browser from user agent
+function getBrowser(userAgent) {
+    let browser = "Unknown";
+    if (userAgent.match(/Firefox/i)) {
+        browser = "Firefox";
+    } else if (userAgent.match(/Chrome/i)) {
+        browser = "Chrome";
+    } else if (userAgent.match(/Safari/i)) {
+        browser = "Safari";
+    } else if (userAgent.match(/Opera|OPR\//i)) {
+        browser = "Opera";
+    } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
+        browser = "Internet Explorer";
+    }
+    return browser; // Removed line break here
+}
 
-        // Get device type
+        // Function to get device type
         function getDeviceType() {
-            // Implement device type detection logic here
-            return 'Desktop'; // Example: Return 'Desktop', 'Mobile', or 'Tablet'
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
         }
 
-        // Get user actions
-        function getUserActions() {
-            // Implement user action logging logic here
-            return 'User actions log'; // Example: Return a log of user actions
+        // Function to display user information in table
+        function displayUserInfo() {
+            const userInfo = getUserInfo();
+            const userInfoBody = document.getElementById('user-info-body');
+            const newRow = userInfoBody.insertRow();
+
+            newRow.innerHTML = `
+                <td>${Math.floor(Math.random() * 1000)}</td>
+                <td>${userInfo.username}</td>
+                <td>${userInfo.os}</td>
+                <td>${userInfo.browser}</td>
+                <td>${userInfo.language}</td>
+                <td>${userInfo.deviceType}</td>
+                <td>${userInfo.screenResolution}</td>
+                <td>${userInfo.referrerURL}</td>
+                <td>${userInfo.sessionDuration} mins</td>
+                <td>${userInfo.userActions.join('<br>')}</td>
+                <td>${userInfo.visitTime}</td>
+            `;
         }
 
-        // Get username
-        function getUsername() {
-            // Implement logic to get the username here
-            return 'User123'; // Example: Return the username
-        }
-
-        // Call the function to collect user data when the page loads
-        window.onload = collectUserData;
+        // Call function to display user information
+        displayUserInfo();
     </script>
 </body>
 </html>
-
