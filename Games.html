@@ -26,10 +26,29 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            background-color: #4B0082; /* Purple */
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #6A0DAD; /* Darker purple on hover */
+        }
+
         .games-container {
             max-width: 800px;
             width: 90%;
-            margin-top: 20px;
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
             border-radius: 10px;
@@ -72,6 +91,10 @@
 
 <header>
     <h1>Games Page</h1>
+    <div class="nav-menu">
+        <a href="https://negative0debuged0.github.io/Negative0Web/">Home</a>
+        <a href="https://negative0debuged0.github.io/Negative0Web/About">About</a>
+    </div>
 </header>
 
 <div class="games-container">
