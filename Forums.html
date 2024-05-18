@@ -156,43 +156,7 @@
 <body>
 
 <div class="navbar">
-    <a href="#">Home</a>
-    <a href="#">About Us</a>
-    <a href="#">Socials</a>
-    <a href="#">Music</a>
-    <a href="#">FAQ</a>
-    <a href="#">Admin Panel</a>
-    <a href="#">Games</a>
-</div>
-
-<div class="forum-panel">
-    <h2>Forum</h2>
-
-    <div class="forum-section">
-        <h3>Create a New Topic</h3>
-        <form id="create-topic-form">
-            <input type="text" id="topic-title" placeholder="Topic Title" required>
-            <textarea id="topic-content" placeholder="Topic Content" rows="5" required></textarea>
-            <button type="submit">Post Topic</button>
-        </form>
-    </div>
-
-    <div class="forum-section">
-        <h3>Topics</h3>
-        <table class="forum-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Replies</th>
-                    <th>Last Post</th>
-                </tr>
-            </thead>
-            <tbody id="forum-topics-body">
-                <!-- Topics will be dynamically populated here -->
-            </tbody>
-        </table>
-    </div>
+    <a href="https://negative0debuged0.github.io/">Home</a>
 </div>
 
 <div class="discord-widget">
@@ -209,24 +173,9 @@
     document.getElementById('create-topic-form').addEventListener('submit', function(event) {
         event.preventDefault();
         
-        const title = document.getElementById('topic-title').value;
-        const content = document.getElementById('topic-content').value;
-        const author = 'User' + Math.floor(Math.random() * 1000); // Replace with actual user logic
-        const replies = 0;
-        const lastPost = new Date().toLocaleString();
+    
 
-        const forumTopicsBody = document.getElementById('forum-topics-body');
-        const newRow = forumTopicsBody.insertRow();
 
-        newRow.innerHTML = `
-            <td>${title}</td>
-            <td>${author}</td>
-            <td>${replies}</td>
-            <td>${lastPost}</td>
-        `;
-
-        // Clear the form
-        document.getElementById('create-topic-form').reset();
     });
 </script>
 </body>
