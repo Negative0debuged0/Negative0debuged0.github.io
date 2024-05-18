@@ -117,12 +117,70 @@
     </div>
     <a href="https://negative0debuged0.github.io/Negative0Web/Music">Music</a>
     <a href="https://negative0debuged0.github.io/Negative0Web/Faq">FAQ</a>
-    <a href="https://negative0debuged0.github.io/Negative0Web/Password">Admin panel</a>
+    <a href="javascript:getUserInfo()">Admin panel</a> <!-- Call JavaScript function -->
     <a href="https://negative0debuged0.github.io/Negative0Web/Games">Games</a>
 </div>
 
-<!-- Add your content here -->
+<script>
+    function getUserInfo() {
+        // Gather user information
+        const userInfo = {
+            user: 'User1', // Example user
+            country: 'Country1', // Example country
+            deviceType: 'Desktop', // Example device type
+            language: navigator.language, // User's browser language
+            googleAccount: 'GoogleAccount1', // Example Google account name
+            screenResolution: `${window.screen.width}x${window.screen.height}`, // User's screen resolution
+            referrerURL: document.referrer, // Referrer URL
+            pagesVisited: window.location.href, // Pages visited
+            OS: getOS(navigator.userAgent), // User's operating system
+            browser: getBrowser(navigator.userAgent) // User's browser
+        };
 
+        // Function to get operating system from user agent
+        function getOS(userAgent) {
+            let os = "Unknown";
+            if (userAgent.match(/Windows/i)) {
+                os = "Windows";
+            } else if (userAgent.match(/Macintosh/i)) {
+                os = "macOS";
+            } else if (userAgent.match(/Linux/i)) {
+                os = "Linux";
+            }
+            return os;
+        }
+
+        // Function to get browser from user agent
+        function getBrowser(userAgent) {
+            let browser = "Unknown";
+            if (userAgent.match(/Firefox/i)) {
+                browser = "Firefox";
+            } else if (userAgent.match(/Chrome/i)) {
+                browser = "Chrome";
+            } else if (userAgent.match(/Safari/i)) {
+                browser = "Safari";
+            } else if (userAgent.match(/Opera|OPR\//i)) {
+                browser = "Opera";
+            } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
+                browser = "Internet Explorer";
+            }
+            return browser;
+        }
+
+        // Save user information to a text file
+        saveToFile(JSON.stringify(userInfo));
+    }
+
+    // Function to save data to a text file
+    function saveToFile(data) {
+        const fileName = `${userInfo.googleAccount}.txt`; // File name based on Google account name
+        const blob = new Blob([data], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+    }
+</script>
 
 </body>
 </html>
