@@ -61,7 +61,7 @@
 </head>
 <body>
 
-<h1>Fake New Tab</h1>
+<h1 id="tab-title">Fake New Tab</h1>
 
 <div class="search-bar">
     <input type="text" placeholder="Search or enter address">
@@ -85,6 +85,28 @@
         <p>Site 4</p>
     </div>
 </div>
+
+<script>
+    const userAgent = navigator.userAgent;
+    const titleElement = document.getElementById('tab-title');
+
+    const browsers = [
+        { name: 'Chrome', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png', keyword: 'Chrome' },
+        { name: 'Firefox', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Mozilla_Firefox_3.5_logo_256.png', keyword: 'Firefox' },
+        { name: 'Opera', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.png', keyword: 'OPR' },
+        { name: 'Brave', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/31/Brave_Browser_logo.png', keyword: 'Brave' },
+        { name: 'Safari', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Safari_browser_logo.png', keyword: 'Safari' }
+    ];
+
+    const browser = browsers.find(b => userAgent.includes(b.keyword));
+    
+    if (browser) {
+        titleElement.textContent = `New ${browser.name} Tab`;
+        document.body.insertAdjacentHTML('afterbegin', `<img src="${browser.logo}" alt="${browser.name} Logo" style="width: 50px; height: 50px; margin-bottom: 10px;">`);
+    } else {
+        titleElement.textContent = 'New Tab';
+    }
+</script>
 
 </body>
 </html>
