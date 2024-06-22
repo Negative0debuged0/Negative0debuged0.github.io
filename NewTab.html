@@ -3,30 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake New Tab Example</title>
+    <title>Fake New Tab</title>
     <style>
         body {
             font-family: Arial, sans-serif;
         }
-        .tab {
-            display: none;
-        }
-        .tab-header {
+        .tabs {
             display: flex;
+            margin-bottom: 10px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
             cursor: pointer;
         }
-        .tab-header div {
-            padding: 10px 20px;
-            background-color: #f1f1f1;
-            margin-right: 2px;
-        }
-        .tab-header div.active {
+        .tab-button.active {
             background-color: #ccc;
+        }
+        .tab-button.new-tab {
+            background-color: #ddd;
         }
         .tab-content {
             padding: 20px;
             border: 1px solid #ccc;
-            border-top: none;
+        }
+        .tab {
+            display: none;
+        }
+        .tab.active {
+            display: block;
         }
     </style>
 </head>
@@ -34,44 +41,66 @@
 
 <h1>Fake New Tab Example</h1>
 
-<div class="tab-header">
-    <div class="tab-link active" onclick="openTab(event, 'Tab1')">Tab 1</div>
-    <div class="tab-link" onclick="openTab(event, 'Tab2')">Tab 2</div>
-    <div class="tab-link" onclick="openTab(event, 'Tab3')">Tab 3</div>
+<div class="tabs" id="tabs">
+    <div class="tab-button new-tab" onclick="createNewTab()">+</div>
 </div>
 
-<div id="Tab1" class="tab tab-content" style="display: block;">
-    <h2>Tab 1</h2>
-    <p>Content for Tab 1.</p>
-</div>
-
-<div id="Tab2" class="tab tab-content">
-    <h2>Tab 2</h2>
-    <p>Content for Tab 2.</p>
-</div>
-
-<div id="Tab3" class="tab tab-content">
-    <h2>Tab 3</h2>
-    <p>Content for Tab 3.</p>
-</div>
+<div id="tab-contents"></div>
 
 <script>
-function openTab(event, tabName) {
-    // Hide all tab content
-    var tabs = document.getElementsByClassName('tab');
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].style.display = 'none';
-    }
-    
-    // Remove active class from all tab links
-    var tabLinks = document.getElementsByClassName('tab-link');
-    for (var i = 0; i < tabLinks.length; i++) {
-        tabLinks[i].classList.remove('active');
+let tabCount = 0;
+
+function createNewTab() {
+    tabCount++;
+
+    // Create a new tab button
+    const newTabButton = document.createElement('div');
+    newTabButton.className = 'tab-button';
+    newTabButton.textContent = 'Tab ' + tabCount;
+    newTabButton.onclick = function() {
+        openTab('tab' + tabCount);
+    };
+
+    // Insert the new tab button before the "+" button
+    const tabs = document.getElementById('tabs');
+    tabs.insertBefore(newTabButton, tabs.querySelector('.new-tab'));
+
+    // Create a new tab content
+    const newTabContent = document.createElement('div');
+    newTabContent.id = 'tab' + tabCount;
+    newTabContent.className = 'tab';
+    newTabContent.innerHTML = `<h2>Tab ${tabCount}</h2><p>Content for Tab ${tabCount}</p>`;
+
+    document.getElementById('tab-contents').appendChild(newTabContent);
+
+    // Open the new tab
+    openTab(newTabContent.id);
+}
+
+function openTab(tabId) {
+    // Hide all tab contents
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Deactivate all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show the selected tab content
+    const selectedTab = document.getElementById(tabId);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
     }
 
-    // Show the current tab and add an active class to the button that opened the tab
-    document.getElementById(tabName).style.display = 'block';
-    event.currentTarget.classList.add('active');
+    // Activate the selected tab button
+    const selectedButton = Array.from(tabButtons).find(button => button.textContent === 'Tab ' + tabId.replace('tab', ''));
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+    }
 }
 </script>
 
