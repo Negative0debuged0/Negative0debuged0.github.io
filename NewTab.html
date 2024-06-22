@@ -3,106 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake New Tab</title>
+    <title>Fake New Tab Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 10px;
-        }
-        .tab-button {
-            padding: 10px 20px;
-            margin-right: 5px;
-            background-color: #f1f1f1;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
-        .tab-button.active {
-            background-color: #ccc;
-        }
-        .tab-button.new-tab {
-            background-color: #ddd;
-        }
-        .tab-content {
+            background-color: #f9f9f9;
+            margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .search-bar {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+        .search-bar input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
             border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        .tab {
-            display: none;
+        .recent-sites {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
         }
-        .tab.active {
-            display: block;
+        .site {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .site img {
+            max-width: 50px;
+            max-height: 50px;
+        }
+        .site:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
 
-<h1>Fake New Tab Example</h1>
+<h1>Fake New Tab</h1>
 
-<div class="tabs" id="tabs">
-    <div class="tab-button new-tab" onclick="createNewTab()">+</div>
+<div class="search-bar">
+    <input type="text" placeholder="Search or enter address">
 </div>
 
-<div id="tab-contents"></div>
-
-<script>
-let tabCount = 0;
-
-function createNewTab() {
-    tabCount++;
-
-    // Create a new tab button
-    const newTabButton = document.createElement('div');
-    newTabButton.className = 'tab-button';
-    newTabButton.textContent = 'Tab ' + tabCount;
-    newTabButton.onclick = function() {
-        openTab('tab' + tabCount);
-    };
-
-    // Insert the new tab button before the "+" button
-    const tabs = document.getElementById('tabs');
-    tabs.insertBefore(newTabButton, tabs.querySelector('.new-tab'));
-
-    // Create a new tab content
-    const newTabContent = document.createElement('div');
-    newTabContent.id = 'tab' + tabCount;
-    newTabContent.className = 'tab';
-    newTabContent.innerHTML = `<h2>Tab ${tabCount}</h2><p>Content for Tab ${tabCount}</p>`;
-
-    document.getElementById('tab-contents').appendChild(newTabContent);
-
-    // Open the new tab
-    openTab(newTabContent.id);
-}
-
-function openTab(tabId) {
-    // Hide all tab contents
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.classList.remove('active');
-    });
-
-    // Deactivate all tab buttons
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => {
-        button.classList.remove('active');
-    });
-
-    // Show the selected tab content
-    const selectedTab = document.getElementById(tabId);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-
-    // Activate the selected tab button
-    const selectedButton = Array.from(tabButtons).find(button => button.textContent === 'Tab ' + tabId.replace('tab', ''));
-    if (selectedButton) {
-        selectedButton.classList.add('active');
-    }
-}
-</script>
+<div class="recent-sites">
+    <div class="site">
+        <img src="https://via.placeholder.com/50" alt="Site 1">
+        <p>Site 1</p>
+    </div>
+    <div class="site">
+        <img src="https://via.placeholder.com/50" alt="Site 2">
+        <p>Site 2</p>
+    </div>
+    <div class="site">
+        <img src="https://via.placeholder.com/50" alt="Site 3">
+        <p>Site 3</p>
+    </div>
+    <div class="site">
+        <img src="https://via.placeholder.com/50" alt="Site 4">
+        <p>Site 4</p>
+    </div>
+</div>
 
 </body>
 </html>
