@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Other Stuff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #808080, #008080); /* Vertical gradient: gray to teal */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, #808080, #008080); /* Gradient navbar: gray to teal */
+            padding: 1em 2em;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .navbar a {
+            color: #eaeaea;
+            padding: 10px 15px;
+            text-decoration: none;
+            text-align: center;
+            position: relative;
+            transition: color 0.3s, transform 0.3s;
+            font-size: 0.9em; /* Adjust font size */
+            margin-right: 1em; /* Add margin to space out the links */
+        }
+        .navbar a::before {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ff6347;
+            transition: width 0.3s;
+        }
+        .navbar a:hover {
+            color: #ff6347;
+            transform: translateY(-2px);
+        }
+        .navbar a:hover::before {
+            width: 100%;
+        }
+        .content {
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 100px; /* Adjust according to navbar height */
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        /* Additional section styling */
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-weight: 400;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .section p {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="https://negative0debuged0.github.io/">Home</a>
+    <a href="https://negative0debuged0.github.io/Negative0Web/Games">Games</a>
+    <a href="https://negative0debuged0.github.io/Negative0Web/OtherStuff">Other Stuff</a>
+</div>
+
+<div class="content">
+    <h1>Other Stuff</h1>
+    <div class="section">
+        <h2>Youtube Ripoff</h2>
+        <p>Content for section 1 goes here. You can add more details, images, or links as needed.</p>
+    </div>
+    <div class="section">
+        <h2>Section 2</h2>
+        <p>Content for section 2 goes here. Add any additional information or resources relevant to this section.</p>
+    </div>
+    <!-- Add more sections as needed -->
+</div>
+
+</body>
+</html>
