@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake New Tab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #008080, #808080); /* Gradient background: teal to gray */
+            color: #fff;
+        }
+
+        .search-container {
+            text-align: center;
+        }
+
+        .search-bar {
+            width: 80%;
+            max-width: 600px;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            outline: none;
+        }
+
+        .search-bar:focus {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .frequent-sites {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .site {
+            margin: 10px;
+            text-align: center;
+        }
+
+        .site img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .site img:hover {
+            transform: scale(1.1);
+        }
+
+        .site-name {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Search the web...">
+    </div>
+
+    <div class="frequent-sites">
+        <div class="site" onclick="window.location.href='https://www.google.com';">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png" alt="Google">
+            <div class="site-name">Google</div>
+        </div>
+        <div class="site" onclick="window.location.href='https://www.youtube.com';">
+            <img src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-logo-full_color_light.svg" alt="YouTube">
+            <div class="site-name">YouTube</div>
+        </div>
+        <div class="site" onclick="window.location.href='https://www.facebook.com';">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+            <div class="site-name">Facebook</div>
+        </div>
+        <div class="site" onclick="window.location.href='https://www.twitter.com';">
+            <img src="https://upload.wikimedia.org/wikipedia/en/6/60/Twitter_Logo_as_of_2021.svg" alt="Twitter">
+            <div class="site-name">Twitter</div>
+        </div>
+    </div>
+</body>
+</html>
