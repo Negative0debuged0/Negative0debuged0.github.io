@@ -11,10 +11,12 @@
             margin: 0;
             padding: 0;
             background: linear-gradient(135deg, #FF0000, #000000); /* Gradient background: red to black */
+            background-size: 200% 200%;
             color: #eaeaea;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-position 5s ease;
         }
         .navbar {
             display: flex;
@@ -103,6 +105,28 @@
         .counter {
             margin: 20px 0;
         }
+        .gradient-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #555;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 20px;
+        }
+        .gradient-button:hover {
+            background-color: #777;
+        }
+        .animated-bg {
+            animation: gradientBackground 10s ease infinite;
+        }
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body>
@@ -130,66 +154,9 @@
     <h3>Welcome to my Website! Enjoy your stay<span id="count"></span></h3>
 </div>
 
+<button class="gradient-button" onclick="toggleGradient()">Toggle Animated Background</button>
+
 <script>
-    function getUserInfo() {
-        // Gather user information
-        const userInfo = {
-            user: 'User1', // Example user
-            country: 'Country1', // Example country
-            deviceType: 'Desktop', // Example device type
-            language: navigator.language, // User's browser language
-            googleAccount: 'GoogleAccount1', // Example Google account name
-            screenResolution: `${window.screen.width}x${window.screen.height}`, // User's screen resolution
-            referrerURL: document.referrer, // Referrer URL
-            pagesVisited: window.location.href, // Pages visited
-            OS: getOS(navigator.userAgent), // User's operating system
-            browser: getBrowser(navigator.userAgent) // User's browser
-        };
-
-        // Function to get operating system from user agent
-        function getOS(userAgent) {
-            let os = "Unknown";
-            if (userAgent.match(/Windows/i)) {
-                os = "Windows";
-            } else if (userAgent.match(/Macintosh/i)) {
-                os = "macOS";
-            } else if (userAgent.match(/Linux/i)) {
-                os = "Linux";
-            }
-            return os;
-        }
-
-        // Function to get browser from user agent
-        function getBrowser(userAgent) {
-            let browser = "Unknown";
-            if (userAgent.match(/Firefox/i)) {
-                browser = "Firefox";
-            } else if (userAgent.match(/Chrome/i)) {
-                browser = "Chrome";
-            } else if (userAgent.match(/Safari/i)) {
-                browser = "Safari";
-            } else if (userAgent.match(/Opera|OPR\//i)) {
-                browser = "Opera";
-            } else if (userAgent.match(/Trident/i) || userAgent.match(/MSIE/i)) {
-                browser = "Internet Explorer";
-            }
-            return browser;
-        }
-
-        // Save user information to a text file
-        saveToFile(JSON.stringify(userInfo));
-    }
-
-    // Function to save data to a text file
-    function saveToFile(data) {
-        const fileName = `${userInfo.googleAccount}.txt`; // File name based on Google account name
-        const blob = new Blob([data], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
-    }
-
     // Fetch visitor count from CountAPI
     async function updateCounter() {
         const response = await fetch('https://api.countapi.xyz/hit/your-namespace/your-key');
@@ -199,6 +166,11 @@
 
     // Update counter on page load
     document.addEventListener('DOMContentLoaded', updateCounter);
+
+    // Toggle animated background
+    function toggleGradient() {
+        document.body.classList.toggle('animated-bg');
+    }
 </script>
 
 </body>
