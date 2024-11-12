@@ -1,4 +1,4 @@
-name: Example GitHub Actions Workflow
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -6,15 +6,25 @@ on:
       - main
 
 jobs:
-  example-job:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Use the secret
-        run: |
-          echo "The secret value is ${{ secrets.MY_API_TOKEN }}"
-        env:
-          MY_API_TOKEN: ${{ secrets.MY_API_TOKEN }}
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Set GITHUB_TOKEN environment variable
+      run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+    - name: Deploy to GitHub Pages
+      run: |
+        echo "Deploying to GitHub Pages..."
+        npm run deploy  # Replace with your deployment command if you use a specific tool like gh-pages
