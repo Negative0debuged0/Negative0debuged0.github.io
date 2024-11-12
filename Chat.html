@@ -170,10 +170,7 @@
   <script>
     const GIST_ID = '1197dbeb30bd90fd850f7176b0f5981f';  // Replace with your Gist ID
     const API_URL = `https://api.github.com/gists/${GIST_ID}`;
-
-    // Fetch the GitHub token dynamically from environment variables injected by GitHub Actions
-    const TOKEN = process.env.GITHUB_TOKEN || ''; // This will be injected during build
-
+    const TOKEN = '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'; // Replace with your GitHub token
     const ADMIN_PASSWORD = "ExaTerra10100"; // Admin password
 
     let currentMessages = [];
