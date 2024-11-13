@@ -169,7 +169,7 @@
 
   <script>
     const GIST_ID = '6686b37f704607d66c455ceefef7fec6';  // Replace with your Gist ID
-    const API_URL = `https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6`;
+    const API_URL = `https://api.github.com/gists/${GIST_ID}`;
     const ADMIN_PASSWORD = "10242048"; // Admin password
 
     let currentMessages = [];
@@ -198,31 +198,12 @@
     }
 
     function fetchMessages() {
-      fetch(API_URL, {
-        headers: {
-          'Authorization': `Bearer ${'secrets.GH_TOKEN'}`, // Use your personal access token securely
-          'If-None-Match': lastFetchTime, // Check if the content has changed since last fetch
-        }
-      })
-      .then(response => {
-        if (response.status === 304) {
-          return; // No content change
-        } else if (response.status === 200) {
-          lastFetchTime = response.headers.get('ETag'); // Update ETag if modified
-          return response.json();
-        } else {
-          throw new Error('Failed to fetch messages');
-        }
-      })
+      fetch('/api/fetchMessages')  // Call your backend or GitHub Actions for fetching data securely
+      .then(response => response.json())
       .then(data => {
         if (data) {
-          const gistContent = data.files['chat.json'].content;
-          try {
-            currentMessages = JSON.parse(gistContent).messages || [];
-            displayMessages(currentMessages);
-          } catch (err) {
-            console.error('Error parsing messages:', err);
-          }
+          currentMessages = data.messages || [];
+          displayMessages(currentMessages);
         }
       })
       .catch(err => {
@@ -281,59 +262,54 @@
 
     function sendMessage() {
       const messageInput = document.getElementById('messageInput');
-      const text = messageInput.value.trim();
-      if (!text) return;
-      
+      if (!messageInput.value.trim()) return;
+
       const newMessage = {
-        sender: userName || 'Anonymous',
-        text,
+        sender: userName,
+        text: messageInput.value.trim(),
         timestamp: new Date().toISOString(),
         reactions: {},
-        replyTo: replyingToMessage ? { sender: replyingToMessage.sender, text: replyingToMessage.text } : null
+        replyTo: replyingToMessage || null
       };
-      
+
       currentMessages.push(newMessage);
-      replyingToMessage = null; // Clear the reply context
-      messageInput.value = '';
-      messageInput.placeholder = 'Type a message...';
-      
+      displayMessages(currentMessages);
       updateGist();
+      messageInput.value = '';
+      replyingToMessage = null;
     }
 
     function updateGist() {
-      const gistData = {
+      const gistContent = {
         files: {
           'chat.json': {
-            content: JSON.stringify({ messages: currentMessages }, null, 2)
+            content: JSON.stringify({ messages: currentMessages })
           }
         }
       };
-      
+
       fetch(API_URL, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${'secrets.GH_TOKEN'}`,  // Use your token securely
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${'$GITHUB_TOKEN'}`,  // Replace with your secure method of fetching token
+          'Accept': 'application/vnd.github.v3+json',
         },
-        body: JSON.stringify(gistData)
+        body: JSON.stringify(gistContent)
       })
       .then(response => response.json())
       .then(data => {
-        console.log('Updated Gist:', data);
-        fetchMessages();  // Refresh messages after update
+        console.log('Gist updated', data);
       })
       .catch(err => {
         console.error('Error updating Gist:', err);
       });
     }
 
-    // Set event listeners for buttons
     document.getElementById('setNameButton').addEventListener('click', setName);
     document.getElementById('adminLoginButton').addEventListener('click', adminLogin);
     document.getElementById('sendMessageButton').addEventListener('click', sendMessage);
-
-    // Fetch messages when the page loads
-    fetchMessages();
+    
+    fetchMessages(); // Initial load of messages
   </script>
 </body>
 </html>
