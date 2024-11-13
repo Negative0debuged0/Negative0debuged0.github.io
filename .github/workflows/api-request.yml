@@ -1,0 +1,22 @@
+name: API Request Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  make-api-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Make API call
+        env:
+          API_KEY: ${{ secrets.GH_TOKEN }} # Access secret from GitHub Secrets
+        run: |
+          curl -X GET "https://api.github.com/gists/your_gist_id" \
+          -H "Authorization: Bearer $API_KEY" \
+          -H "Accept: application/vnd.github.v3+json"
