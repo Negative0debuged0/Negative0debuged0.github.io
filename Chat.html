@@ -200,7 +200,7 @@
     function fetchMessages() {
       fetch(API_URL, {
         headers: {
-          'Authorization': `Bearer ${'YOUR_GITHUB_TOKEN'}`, // Use your personal access token securely
+          'Authorization': `Bearer ${'secrets.GH_TOKEN'}`, // Use your personal access token securely
           'If-None-Match': lastFetchTime, // Check if the content has changed since last fetch
         }
       })
