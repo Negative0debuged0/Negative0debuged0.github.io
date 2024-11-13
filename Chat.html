@@ -199,7 +199,7 @@
       fetch(GIST_API_URL, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${process.env.GH_TOKEN}`, // Include the GitHub token
+          'Authorization': `Bearer ${YOUR_GITHUB_TOKEN}`, // Include the GitHub token
           'Accept': 'application/vnd.github.v3+json', // Ensure GitHub API returns JSON
         },
       })
