@@ -26,7 +26,7 @@ jobs:
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4
       with:
-        branch: main  # Deploy to the gh-pages branch
+        branch: UserInfo  # Deploy to the gh-pages branch
         folder: UserInfo
 
     - name: Update Gist with New Messages
