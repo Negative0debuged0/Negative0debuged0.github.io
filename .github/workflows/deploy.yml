@@ -3,41 +3,31 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Trigger this on pushes to the main branch (adjust if needed)
+      - main  # Trigger when changes are pushed to the main branch
 
 permissions:
-  contents: write   # This allows the action to push changes to the repository
+  contents: write  # This ensures write access to the contents of the repository
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'  # Adjust the Node.js version if needed
+    - name: Set up Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+      
+    - name: Build site (optional)
+      run: |
+        npm install
+        npm run build  # Customize based on your site build process
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Fetch and update Gist
-        run: |
-          curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               -X GET \
-               "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" > gist_data.json
-          
-          # Modify the Gist content as needed here (using jq or other methods)
-          
-          curl -X PATCH "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" \
-               -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
-               -d @gist_data.json
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}  # Use the secret to authenticate the deployment
-          publish_dir: ./public  # The directory where your static files are built (adjust if needed)
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GH_TOKEN }}  # Use the secret token to authenticate
+        publish_dir: UserInfo  # Adjust if your output directory differs
