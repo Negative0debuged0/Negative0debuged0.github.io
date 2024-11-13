@@ -1,31 +1,58 @@
-name: API Request Workflow
+name: Gist API Requests
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger this workflow when pushing to the main branch
 
 jobs:
   make-api-request:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # This will run on the latest Ubuntu
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Make API call to GitHub Gist
+      - name: Fetch Gist data
         env:
-          API_KEY: ${{ secrets.GH_TOKEN }}  # Access secret from GitHub Secrets
+          API_KEY: ${{ secrets.GH_TOKEN }}  # GitHub token from Secrets
         run: |
+          # Fetch the Gist content using GitHub API
+          echo "Fetching Gist content..."
           curl -X GET "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" \
-          -H "Authorization: Bearer $API_KEY" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -o gist.json  # Save the response to a file
-          
-      - name: Commit and Push gist.json to repository
+            -H "Authorization: Bearer $API_KEY" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -o gist.json
+
+      - name: Display fetched Gist content
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add gist.json
-          git commit -m "Update Gist data"
-          git push
+          # Show the contents of the fetched Gist
+          cat gist.json  # Output the Gist content to the workflow logs
+
+      - name: Update Gist content
+        env:
+          API_KEY: ${{ secrets.GH_TOKEN }}  # GitHub token from Secrets
+        run: |
+          # Prepare the updated Gist content
+          echo "Updating Gist content..."
+          gist_data='{
+            "files": {
+              "chat.json": {
+                "content": "{\"messages\": [{\"sender\": \"User\", \"text\": \"Hello, World!\", \"timestamp\": \"2024-11-13T12:00:00Z\"}]}"
+              }
+            }
+          }'
+
+          # Update the Gist with the new content
+          curl -X PATCH "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" \
+            -H "Authorization: Bearer $API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$gist_data"
+
+      - name: Display updated Gist content
+        run: |
+          # Optionally, verify the update was successful
+          curl -X GET "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" \
+            -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json"
+
