@@ -44,4 +44,4 @@ jobs:
                   }
                 }
               }' \
-          "https://api.github.com/gists/YOUR_GIST_ID"
+          "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6"
