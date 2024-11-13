@@ -3,31 +3,30 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Trigger when changes are pushed to the main branch
+      - main  # Trigger on pushes to the 'main' branch
 
 permissions:
-  contents: write  # This ensures write access to the contents of the repository
+  contents: write  # Grant permission to write to the repository's contents
+  id-token: write   # Allow actions to create an id-token for authentication
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Run on the latest Ubuntu environment
 
     steps:
+    # Step 1: Checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    # Step 2: Set up Git configuration (required for committing changes)
     - name: Set up Git
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-      
-    - name: Build site (optional)
-      run: |
-        npm install
-        npm run build  # Customize based on your site build process
 
+    # Step 3: Deploy to GitHub Pages (skip the build step)
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GH_TOKEN }}  # Use the secret token to authenticate
-        publish_dir: UserInfo  # Adjust if your output directory differs
+        github_token: ${{ secrets.GH_TOKEN }}  # Use the GitHub token for authentication
+        publish_dir: ./  # Publish from the root directory (adjust if needed)
