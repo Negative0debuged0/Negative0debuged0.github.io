@@ -168,7 +168,6 @@
 
   <script>
     const GIST_API_URL = 'https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6';
-    const GH_TOKEN = 'process.env.GH_TOKEN'; // Use GitHub token securely
     const ADMIN_PASSWORD = "10242048"; // Admin password
     
     let currentMessages = [];
@@ -299,7 +298,7 @@
       fetch(GIST_API_URL, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${GH_TOKEN}`,
+          'Authorization': `Bearer ${process.env.GH_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         },
