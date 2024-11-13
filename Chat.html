@@ -114,7 +114,7 @@
     }
 
     /* Input and Button Styling */
-    textarea, input[type="text"], input[type="password"] {
+    textarea, input[type="text"], input[type="password"], input[type="text"] {
       width: 100%;
       padding: 15px;
       margin: 10px 0;
@@ -149,24 +149,32 @@
     <a href="#">Home</a>
   </div>
 
-  <!-- Chat Container -->
+  <!-- Token Input Form -->
   <div class="chat-container">
     <h1>Zer0's Chat</h1>
 
-    <input type="text" id="nameInput" placeholder="Enter your name" required>
-    <button id="setNameButton">Set Name</button>
-
-    <div id="adminLogin">
-      <input type="password" id="adminPassword" placeholder="Enter admin password">
-      <button id="adminLoginButton">Login as Admin</button>
+    <div id="tokenInputForm">
+      <input type="text" id="githubTokenInput" placeholder="Enter your GitHub Token" required>
+      <button id="setTokenButton">Set Token</button>
     </div>
-  
-    <div id="messages"></div>
-    <textarea id="messageInput" placeholder="Type a message..." rows="4"></textarea><br>
-    <button id="sendMessageButton">Send Message</button>
+
+    <div id="chatArea" style="display: none;">
+      <input type="text" id="nameInput" placeholder="Enter your name" required>
+      <button id="setNameButton">Set Name</button>
+
+      <div id="adminLogin">
+        <input type="password" id="adminPassword" placeholder="Enter admin password">
+        <button id="adminLoginButton">Login as Admin</button>
+      </div>
+    
+      <div id="messages"></div>
+      <textarea id="messageInput" placeholder="Type a message..." rows="4"></textarea><br>
+      <button id="sendMessageButton">Send Message</button>
+    </div>
   </div>
 
   <script>
+    let gh_token = ''; // Token will be set after user inputs it
     const GIST_API_URL = 'https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6';
     const ADMIN_PASSWORD = "10242048"; // Admin password
     
@@ -175,6 +183,19 @@
     let isAdmin = false;
     let replyingToMessage = null;
     let lastFetchTime = ''; // For ETag-based conditional fetching
+
+    // Set the GitHub token
+    function setGitHubToken() {
+      const tokenInput = document.getElementById('githubTokenInput');
+      gh_token = tokenInput.value.trim();
+      if (gh_token) {
+        document.getElementById('tokenInputForm').style.display = 'none';
+        document.getElementById('chatArea').style.display = 'block';
+        fetchMessages();
+      } else {
+        alert("Please enter a valid GitHub token.");
+      }
+    }
 
     function setName() {
       const nameInput = document.getElementById('nameInput');
@@ -199,8 +220,8 @@
       fetch(GIST_API_URL, {
         method: 'GET',
         headers: {
-          'Authorization': `${GH_TOKEN}`, // Include the GitHub token
-          'Accept': 'application/vnd.github.v3+json', // Ensure GitHub API returns JSON
+          'Authorization': `token ${gh_token}`, // Use the entered GitHub token
+          'Accept': 'application/vnd.github.v3+json',
         },
       })
       .then(response => {
@@ -241,19 +262,33 @@
           replyDiv.innerHTML = `<strong>Reply to:</strong> ${message.replyTo.sender}: "${message.replyTo.text}"`;
           messageDiv.appendChild(replyDiv);
         }
+
+        const messageText = document.createElement('p');
+        messageText.innerHTML = `${message.sender}: ${message.text}`;
+        messageDiv.appendChild(messageText);
         
-        messageDiv.innerHTML += `
-          <strong>${message.sender}</strong>: ${message.text}
-          <div class="timestamp">${new Date(message.timestamp).toLocaleString()}</div>
-          <div class="reactions">${renderReactions(message.reactions, index)}</div>
-          <span class="reply" onclick="replyToMessage(${index})">Reply</span>
-        `;
-        
+        const timestamp = document.createElement('span');
+        timestamp.classList.add('timestamp');
+        timestamp.textContent = new Date(message.timestamp).toLocaleString();
+        messageDiv.appendChild(timestamp);
+
+        // Reactions section
+        const reactionsDiv = document.createElement('div');
+        reactionsDiv.classList.add('reactions');
+        reactionsDiv.innerHTML = generateReactions(message.reactions || {}, index);
+        messageDiv.appendChild(reactionsDiv);
+
+        const replyButton = document.createElement('button');
+        replyButton.classList.add('reply');
+        replyButton.innerHTML = 'Reply';
+        replyButton.onclick = () => replyToMessage(index);
+        messageDiv.appendChild(replyButton);
+
         messagesDiv.appendChild(messageDiv);
       });
     }
 
-    function renderReactions(reactions, index) {
+    function generateReactions(reactions, index) {
       const reactionTypes = ['👍', '❤️', '😂', '😮', '😢', '😡'];
       return reactionTypes.map(type => {
         const count = reactions[type] || 0;
@@ -298,7 +333,7 @@
       fetch(GIST_API_URL, {
         method: 'PATCH',
         headers: {
-          'Authorization': `${GH_TOKEN}`,
+          'Authorization': `token ${gh_token}`,
           'Accept': 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         },
@@ -320,12 +355,10 @@
     }
 
     // Event Listeners
+    document.getElementById('setTokenButton').addEventListener('click', setGitHubToken);
     document.getElementById('setNameButton').addEventListener('click', setName);
     document.getElementById('adminLoginButton').addEventListener('click', adminLogin);
     document.getElementById('sendMessageButton').addEventListener('click', sendMessage);
-
-    // Fetch messages on page load
-    fetchMessages();
   </script>
 </body>
 </html>
