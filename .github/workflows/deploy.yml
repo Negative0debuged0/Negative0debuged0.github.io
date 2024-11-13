@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Trigger this on pushes to the main branch (adjust if needed)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js (if you are using Node.js in the workflow)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Adjust the Node.js version if needed
+
+      # Install dependencies (if using npm/yarn)
+      - name: Install dependencies
+        run: npm install
+
+      # Fetch and update the Gist using the GH_TOKEN securely
+      - name: Fetch and update Gist
+        run: |
+          curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               -X GET \
+               "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" > gist_data.json
+          
+          # You can modify the Gist content here (e.g., using `jq` or custom logic)
+          # Assuming you're adding new messages, make sure you modify gist_data.json correctly
+          
+          curl -X PATCH "https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6" \
+               -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+               -d @gist_data.json
+
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}  # Use the secret to authenticate the deployment
+          publish_dir: ./public  # The directory where your static files are built (adjust if needed)
+
+
