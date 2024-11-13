@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake New Tab Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .search-bar {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+        .search-bar input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .recent-sites {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .site {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            text-decoration: none;
+            color: black;
+        }
+        .site img {
+            max-width: 50px;
+            max-height: 50px;
+        }
+        .site:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<h1 id="tab-title">Fake New Tab</h1>
+
+<div class="search-bar">
+    <input type="text" placeholder="Search or enter address">
+</div>
+
+<div class="recent-sites">
+    <a href="https://negative0debuged0.github.io/YoutubeRipoff" class="site" target="_blank">
+        <img src="https://img.freepik.com/free-psd/3d-square-with-youtube-logo_125540-1573.jpg" alt="Riptube">
+        <p>Riptube</p>
+    </a>
+    <a href="https://negative0debuged0.github.io/Game2" class="site" target="_blank">
+        <img src="https://via.placeholder.com/50" alt="Snake Game">
+        <p>Snake game</p>
+    </a>
+    <a href="https://negative0debuged0.github.io" class="site" target="_blank">
+        <img src="https://via.placeholder.com/50" alt="Negative0's website">
+        <p>Negative0's website</p>
+    </a>
+    <a href="https://example.com" class="site" target="_blank">
+        <img src="https://via.placeholder.com/50" alt="Example">
+        <p>Example Site</p>
+    </a>
+</div>
+
+<script>
+    const userAgent = navigator.userAgent;
+    const titleElement = document.getElementById('tab-title');
+
+    const browsers = [
+        { name: 'Chrome', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png', keyword: 'Chrome' },
+        { name: 'Firefox', logo: 'https://play-lh.googleusercontent.com/yssuOUUgzoiZve-NfSvkykhAP9QbnFEL-NfLNHmTjnAcLCMnEpZsvwg1brdSuRZrqg', keyword: 'Firefox' },
+        { name: 'Opera', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Opera_2015_icon.png', keyword: 'OPR' },
+        { name: 'Brave', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/31/Brave_Browser_logo.png', keyword: 'Brave' },
+        { name: 'Safari', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Safari_browser_logo.png', keyword: 'Safari' }
+    ];
+
+    const browser = browsers.find(b => userAgent.includes(b.keyword));
+    
+    if (browser) {
+        titleElement.textContent = `New ${browser.name} Tab`;
+        document.body.insertAdjacentHTML('afterbegin', `<img src="${browser.logo}" alt="${browser.name} Logo" style="width: 50px; height: 50px; margin-bottom: 10px;">`);
+    } else {
+        titleElement.textContent = 'New Tab';
+    }
+</script>
+
+</body>
+</html>

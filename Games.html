@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #6A0DAD, #1E90FF); /* Gradient background: purple to blue */
+            color: #fff;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4B0082, #00BFFF); /* Gradient header: darker purple to lighter blue */
+            color: #fff;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            background-color: #4B0082; /* Purple */
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background-color: #6A0DAD; /* Darker purple on hover */
+        }
+
+        .games-container {
+            max-width: 800px;
+            width: 90%;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .game {
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .game img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 10px;
+            transition: filter 0.3s ease;
+        }
+
+        .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFD700; /* Gold color for game titles */
+        }
+
+        /* Hover effects */
+        .game:hover {
+            transform: scale(1.05);
+        }
+
+        .game:hover img {
+            filter: brightness(80%);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Games Page</h1>
+    <div class="nav-menu">
+        <a href="https://negative0debuged0.github.io/">Home</a>
+        <a href="https://negative0debuged0.github.io/About">About</a>
+    </div>
+</header>
+
+<div class="games-container">
+    <div class="game" onclick="window.location.href='https://negative0debuged0.github.io/flappy';">
+        <div class="game-title">Flappy Zer0</div>
+        <img src="Game1.png" alt="Game 1">
+    </div>
+    <div class="game" onclick="window.location.href='https://negative0debuged0.github.io/Game2';">
+        <div class="game-title">Snake game</div>
+        <img src="Game2.png" alt="Game 2">
+    </div>
+ <div class="game" onclick="window.location.href='https://negative0debuged0.github.io/pingpong';">
+        <div class="game-title">pingpong</div>
+        <img src="pingpong.png" alt="pingpong">
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #6A0DAD, #1E90FF); /* Gradient background: purple to blue */
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4B0082, #00BFFF); /* Gradient header: darker purple to lighter blue */
+            color: #fff;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #gameCanvas {
+            border: 1px solid #fff;
+            background-color: #87CEEB; /* Sky blue */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ping Pong Game</h1>
+    </header>
+
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Paddle properties
+        const paddleWidth = 100;
+        const paddleHeight = 10;
+        const playerPaddleY = canvas.height - 20;
+        const aiPaddleY = 10;
+        let playerPaddleX = (canvas.width - paddleWidth) / 2;
+        let aiPaddleX = (canvas.width - paddleWidth) / 2;
+
+        // Ball properties
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        const ballRadius = 10;
+        let ballSpeedX = 4;
+        let ballSpeedY = 4;
+
+        // AI properties
+        const aiMaxSpeed = 5; // Max speed for the AI paddle
+        const aiReactionTime = 0.05; // AI reaction delay, simulating a human-like response
+
+        // Game loop
+        function gameLoop() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw paddles
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(playerPaddleX, playerPaddleY, paddleWidth, paddleHeight); // Player paddle
+            ctx.fillRect(aiPaddleX, aiPaddleY, paddleWidth, paddleHeight); // AI paddle
+
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#FF4500";
+            ctx.fill();
+            ctx.closePath();
+
+            // Move the ball
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            // Ball collision with walls
+            if (ballX + ballRadius > canvas.width || ballX - ballRadius < 0) {
+                ballSpeedX = -ballSpeedX;
+            }
+
+            // Ball collision with paddles
+            if (ballY + ballRadius > playerPaddleY && ballX > playerPaddleX && ballX < playerPaddleX + paddleWidth) {
+                ballSpeedY = -ballSpeedY;
+            }
+            if (ballY - ballRadius < aiPaddleY + paddleHeight && ballX > aiPaddleX && ballX < aiPaddleX + paddleWidth) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            // Ball out of bounds (reset)
+            if (ballY + ballRadius > canvas.height || ballY - ballRadius < 0) {
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                ballSpeedY = -ballSpeedY;
+            }
+
+            // Move AI paddle with smarter logic
+            moveAIPaddle();
+
+            // Update game again
+            window.requestAnimationFrame(gameLoop); // Use window for requestAnimationFrame
+        }
+
+        function moveAIPaddle() {
+            // Predict where the ball is going
+            const paddleCenterX = aiPaddleX + paddleWidth / 2;
+
+            // Move the AI paddle towards the ball's X position gradually
+            if (ballX < paddleCenterX - 10) {
+                aiPaddleX -= aiMaxSpeed;
+            } else if (ballX > paddleCenterX + 10) {
+                aiPaddleX += aiMaxSpeed;
+            }
+
+            // Keep AI paddle within the canvas
+            if (aiPaddleX < 0) {
+                aiPaddleX = 0;
+            } else if (aiPaddleX + paddleWidth > canvas.width) {
+                aiPaddleX = canvas.width - paddleWidth;
+            }
+        }
+
+        // Move player paddle with mouse
+        canvas.addEventListener("mousemove", function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            playerPaddleX = mouseX - paddleWidth / 2;
+
+            // Keep player paddle within the canvas
+            if (playerPaddleX < 0) {
+                playerPaddleX = 0;
+            } else if (playerPaddleX + paddleWidth > canvas.width) {
+                playerPaddleX = canvas.width - paddleWidth;
+            }
+        });
+
+        // Ensure the game loop starts only after the page has fully loaded
+        window.onload = function() {
+            gameLoop(); // Start the game loop
+        };
+    </script>
+</body>
+</html>
+
