@@ -6,8 +6,8 @@ on:
       - main  # Trigger on pushes to the 'main' branch
 
 permissions:
-  contents: write  # Grant permission to write to the repository's contents
-  id-token: write   # Allow actions to create an id-token for authentication
+  contents: write  # Allow writing to the repository
+  id-token: write   # Required for token-based authentication
 
 jobs:
   deploy:
@@ -24,7 +24,7 @@ jobs:
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
 
-    # Step 3: Deploy to GitHub Pages (skip the build step)
+    # Step 3: Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
