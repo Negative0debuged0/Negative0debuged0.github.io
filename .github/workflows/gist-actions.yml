@@ -1,0 +1,57 @@
+name: Update Gist (Chat Messages)
+
+on:
+  workflow_dispatch:  # This allows us to manually trigger the action
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'fetch'
+
+jobs:
+  update-gist:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up GitHub CLI (for interacting with Gists)
+      - name: Set up GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /usr/share/keyrings/github-archive-keyring.gpg > /dev/null
+          sudo apt update
+          sudo apt install gh
+
+      # Log in to GitHub CLI
+      - name: Authenticate with GitHub CLI
+        run: gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+
+      # Fetch Gist (if action is "fetch")
+      - name: Fetch messages from Gist
+        if: ${{ github.event.inputs.action == 'fetch' }}
+        run: |
+          GIST_ID="6686b37f704607d66c455ceefef7fec6"  # Replace with your Gist ID
+          curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/gists/$GIST_ID \
+            | jq '.files["chat.json"].content'  # Outputs the chat content
+
+      # Update Gist (if action is "update")
+      - name: Update Gist with new messages
+        if: ${{ github.event.inputs.action == 'update' }}
+        run: |
+          GIST_ID="6686b37f704607d66c455ceefef7fec6"  # Replace with your Gist ID
+          GIST_FILE="chat.json"  # The file that stores chat messages
+          MESSAGE_CONTENT="{\"messages\": [{\"sender\": \"User1\", \"text\": \"Hello, world!\"}]}"
+
+          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "files": {
+                "chat.json": {
+                  "content": "'"$MESSAGE_CONTENT"'"
+                }
+              }
+            }' \
+            https://api.github.com/gists/$GIST_ID
