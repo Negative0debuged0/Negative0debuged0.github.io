@@ -27,7 +27,6 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         branch: main  # Deploy to the gh-pages branch
-        folder: dist  # Adjust to your build folder (if you have one)
 
     - name: Update Gist with New Messages
       run: |
