@@ -54,7 +54,6 @@
       flex-direction: column;
       align-items: center;
       margin-top: 80px; /* Add space for the navbar */
-      padding-top: 450px;
     }
     h1 {
       margin-bottom: 20px;
@@ -168,10 +167,10 @@
   </div>
 
   <script>
-    const GIST_ID = '6686b37f704607d66c455ceefef7fec6';  // Replace with your Gist ID
-    const API_URL = `https://api.github.com/gists/${GIST_ID}`;
+    const GIST_API_URL = 'https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6';
+    const GH_TOKEN = '$GITHUB_TOKEN'; // Use GitHub token securely
     const ADMIN_PASSWORD = "10242048"; // Admin password
-
+    
     let currentMessages = [];
     let userName = '';
     let isAdmin = false;
@@ -198,12 +197,31 @@
     }
 
     function fetchMessages() {
-      fetch('/api/fetchMessages')  // Call your backend or GitHub Actions for fetching data securely
-      .then(response => response.json())
+      fetch(GIST_API_URL, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${GH_TOKEN}`, // Include the GitHub token
+          'Accept': 'application/vnd.github.v3+json', // Ensure GitHub API returns JSON
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch Gist: ${response.statusText}`);
+        }
+        return response.json(); // Parse response as JSON
+      })
       .then(data => {
-        if (data) {
-          currentMessages = data.messages || [];
-          displayMessages(currentMessages);
+        const gistContent = data.files['chat.json']?.content;
+        if (gistContent) {
+          try {
+            const messages = JSON.parse(gistContent);  // Parse the JSON content of the Gist file
+            currentMessages = messages.messages || [];
+            displayMessages(currentMessages);
+          } catch (err) {
+            console.error('Error parsing messages:', err);
+          }
+        } else {
+          console.error('chat.json file not found in Gist.');
         }
       })
       .catch(err => {
@@ -251,65 +269,64 @@
       const message = currentMessages[index];
       if (!message.reactions) message.reactions = {};
       message.reactions[reaction] = (message.reactions[reaction] || 0) + 1;
-      updateGist();
+      updateMessages();
     }
 
     function replyToMessage(index) {
       replyingToMessage = currentMessages[index];
-      const messageInput = document.getElementById('messageInput');
-      messageInput.placeholder = `Replying to ${replyingToMessage.sender}: ${replyingToMessage.text}`;
+      document.getElementById('messageInput').value = `@${replyingToMessage.sender} `;
     }
 
     function sendMessage() {
       const messageInput = document.getElementById('messageInput');
-      if (!messageInput.value.trim()) return;
-
-      const newMessage = {
-        sender: userName,
-        text: messageInput.value.trim(),
-        timestamp: new Date().toISOString(),
-        reactions: {},
-        replyTo: replyingToMessage || null
-      };
-
-      currentMessages.push(newMessage);
-      displayMessages(currentMessages);
-      updateGist();
-      messageInput.value = '';
-      replyingToMessage = null;
+      const messageText = messageInput.value.trim();
+      if (messageText) {
+        const newMessage = {
+          sender: userName,
+          text: messageText,
+          timestamp: new Date().toISOString(),
+          reactions: {},
+          replyTo: replyingToMessage ? { sender: replyingToMessage.sender, text: replyingToMessage.text } : null,
+        };
+        currentMessages.push(newMessage);
+        messageInput.value = '';
+        updateMessages();
+      }
     }
 
-    function updateGist() {
-      const gistContent = {
-        files: {
-          'chat.json': {
-            content: JSON.stringify({ messages: currentMessages })
-          }
-        }
-      };
-
-      fetch(API_URL, {
+    function updateMessages() {
+      const messagesJson = JSON.stringify({ messages: currentMessages });
+      fetch(GIST_API_URL, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${'$GITHUB_TOKEN'}`,  // Replace with your secure method of fetching token
+          'Authorization': `Bearer ${GH_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(gistContent)
+        body: JSON.stringify({
+          files: {
+            'chat.json': {
+              content: messagesJson,
+            }
+          }
+        }),
       })
       .then(response => response.json())
       .then(data => {
-        console.log('Gist updated', data);
+        console.log('Messages updated successfully', data);
       })
       .catch(err => {
-        console.error('Error updating Gist:', err);
+        console.error('Error updating messages:', err);
       });
     }
 
+    // Event Listeners
     document.getElementById('setNameButton').addEventListener('click', setName);
     document.getElementById('adminLoginButton').addEventListener('click', adminLogin);
     document.getElementById('sendMessageButton').addEventListener('click', sendMessage);
-    
-    fetchMessages(); // Initial load of messages
+
+    // Fetch messages on page load
+    fetchMessages();
   </script>
 </body>
 </html>
