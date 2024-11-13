@@ -26,14 +26,14 @@ jobs:
 
       # Log in to GitHub CLI
       - name: Authenticate with GitHub CLI
-        run: gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+        run: gh auth login --with-token <<< "${{ secrets.GH_TOKEN }}"
 
       # Fetch Gist (if action is "fetch")
       - name: Fetch messages from Gist
         if: ${{ github.event.inputs.action == 'fetch' }}
         run: |
           GIST_ID="6686b37f704607d66c455ceefef7fec6"  # Replace with your Gist ID
-          curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          curl -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
             https://api.github.com/gists/$GIST_ID \
             | jq '.files["chat.json"].content'  # Outputs the chat content
 
@@ -45,7 +45,7 @@ jobs:
           GIST_FILE="chat.json"  # The file that stores chat messages
           MESSAGE_CONTENT="{\"messages\": [{\"sender\": \"User1\", \"text\": \"Hello, world!\"}]}"
 
-          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{
               "files": {
