@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow when pushing to the 'main' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js (if using a build process like React, Vue, etc.)
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # or any version your project requires
+
+    - name: Install dependencies
+      run: |
+        npm install  # If you use npm or yarn, adjust accordingly
+
+    - name: Build the project (if needed)
+      run: |
+        npm run build  # Adjust if needed to build your project
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages  # Deploy to the gh-pages branch
+        folder: dist  # Adjust to your build folder (if you have one)
+
+    - name: Update Gist with New Messages
+      run: |
+        curl -X PATCH \
+          -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "files": {
+                  "chat.json": {
+                    "content": "'"$(cat chat.json)"'"
+                  }
+                }
+              }' \
+          "https://api.github.com/gists/YOUR_GIST_ID"
