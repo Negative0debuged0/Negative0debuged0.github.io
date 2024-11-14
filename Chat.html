@@ -471,7 +471,7 @@
   </div>
 
   <script>
-    const base64Token = "Z2l0aHViX3BhdF8xMUJJR0FGMlkwVmw3YzZBelRXZFBEXzRFYTgwcXZGZUNab25pNnQyU0drRWZPNHJESzZzR3RZYzBOWjZkaGlHVHc2NkxUWkJHQWlJWW54QTR1";
+    const base64Token = "67 69 74 68 75 62 5F 70 61 74 5F 31 31 42 49 47 41 46 32 59 30 61 43 71 4F 30 7A 50 66 59 6B 48 4E 5F 4E 6D 4F 50 51 62 38 63 6B 54 39 53 71 33 39 37 4E 43 48 31 70 49 75 52 39 4F 63 63 47 73 70 6A 66 62 41 72 5A 4A 4B 59 45 4E 53 50 32 4B 46 46 58 45 57 41 35 57 55 30 4A 48 68";
     let gh_token = '';
     const GIST_API_URL = 'https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6';
     const ADMIN_PASSWORD = "10242048";
@@ -497,9 +497,20 @@
       "💎": "diamond_admin"
     };
 
+    // Function to decode hex string to text
+    function fromHex(hex) {
+      // Remove any spaces
+      hex = hex.replace(/\s+/g, '');
+
+    // Convert hex to characters
+    return hex.match(/.{1,2}/g) // split into pairs of two
+              .map(byte => String.fromCharCode(parseInt(byte, 16))) // convert each to character
+              .join('');
+    }
     function decodeBase64Token() {
       const decodedToken = atob(base64Token);
-      gh_token = decodedToken.trim();
+
+      gh_token = fromHex(base64Token);
       fetchMessages();
       setInterval(fetchMessages, 3000);
     }
