@@ -471,7 +471,7 @@
   </div>
 
   <script>
-    const base64Token = "Z2l0aHViX3BhdF8xMUJJR0FGMlkwc2lYUXFicTNjYUpTX0FlamlpSG95RjZWZE50eDJOWVlKckNxeGtIdGcwakc5Rm93R21MUHo1S2lZQjY0NlhSNG9ycVJ3N0lE";
+    const base64Token = "Z2l0aHViX3BhdF8xMUJJR0FGMlkwVmw3YzZBelRXZFBEXzRFYTgwcXZGZUNab25pNnQyU0drRWZPNHJESzZzR3RZYzBOWjZkaGlHVHc2NkxUWkJHQWlJWW54QTR1";
     let gh_token = '';
     const GIST_API_URL = 'https://api.github.com/gists/6686b37f704607d66c455ceefef7fec6';
     const ADMIN_PASSWORD = "10242048";
@@ -500,7 +500,6 @@
     function decodeBase64Token() {
       const decodedToken = atob(base64Token);
       gh_token = decodedToken.trim();
-      console.log("Decoded GitHub Token:", gh_token);
       fetchMessages();
       setInterval(fetchMessages, 3000);
     }
