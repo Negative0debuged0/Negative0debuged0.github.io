@@ -1,0 +1,1989 @@
+<html><head><base href="/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Negative0's Website</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<style>
+    :root {
+        --primary-red: #ff0000;
+        --dark-red: #800000;
+        --accent: #ff6347;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, var(--primary-red), #000000);
+        background-size: 200% 200%;
+        background-attachment: fixed;
+        color: #eaeaea;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .navbar {
+        backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1em 2em;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        gap: 2em;
+    }
+
+    .navbar a {
+        color: #eaeaea;
+        text-decoration: none;
+        padding: 0.5em 1em;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .navbar a:hover {
+        background: rgba(255, 99, 71, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .navbar a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--accent);
+        transition: all 0.3s ease;
+    }
+
+    .navbar a:hover::after {
+        width: 100%;
+        left: 0;
+    }
+
+    .style-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .styles-dropdown-content {
+        display: none;
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .styles-dropdown-content a {
+        color: #eaeaea;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+    .styles-dropdown-content a:hover {
+        background: rgba(255, 99, 71, 0.2);
+    }
+
+    .welcome-box {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        margin: 1em auto;
+        padding: 1.5em;
+        border-radius: 15px;
+        max-width: 1200px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--accent);
+    }
+
+    .welcome-content {
+        color: #eaeaea;
+        text-align: center;
+    }
+
+    .welcome-content h2 {
+        color: var(--accent);
+        margin-bottom: 0.5em;
+    }
+
+    .welcome-content p {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 1em;
+    }
+
+    .welcome-features {
+        display: flex;
+        justify-content: center;
+        gap: 2em;
+        flex-wrap: wrap;
+    }
+
+    .welcome-features div {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.5em 1em;
+        border-radius: 25px;
+    }
+
+    .welcome-features i {
+        color: var(--accent);
+    }
+
+    .main-content {
+        max-width: 1200px;
+        margin: 2em auto;
+        padding: 2em;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2em;
+        margin: 2em 0;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5em;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-icon {
+        font-size: 2em;
+        color: var(--accent);
+        margin-bottom: 0.5em;
+    }
+
+    .gradient-button {
+        background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .gradient-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+    }
+
+    .footer {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 2em;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+        margin: 1em 0;
+    }
+
+    .social-icons a {
+        color: #eaeaea;
+        font-size: 1.5em;
+        transition: color 0.3s ease;
+    }
+
+    .social-icons a:hover {
+        color: var(--accent);
+    }
+
+    .forum-section {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2em;
+        border-radius: 15px;
+        margin: 2em 0;
+    }
+
+    .forum-post {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1.5em;
+        border-radius: 10px;
+        margin: 1em 0;
+        transition: transform 0.3s ease;
+    }
+
+    .forum-post:hover {
+        transform: translateX(5px);
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1em;
+    }
+
+    .post-author {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .post-form {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1.5em;
+        border-radius: 10px;
+        margin: 2em 0;
+    }
+
+    .post-input {
+        width: 100%;
+        padding: 1em;
+        margin: 0.5em 0;
+        border: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #eaeaea;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .post-input:focus {
+        outline: 2px solid var(--accent);
+    }
+
+    .pinned-post {
+        background: rgba(255, 99, 71, 0.1);
+        border: 1px solid var(--accent);
+    }
+
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 1em 2em;
+        border-radius: 5px;
+        color: white;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .notification.success {
+        background: rgba(46, 204, 113, 0.9);
+    }
+
+    .notification.error {
+        background: rgba(231, 76, 60, 0.9);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .gradient-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .admin-panel {
+        padding: 2em;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2em;
+        padding: 1em;
+    }
+
+    .admin-section {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 1.5em;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1em;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1em;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2em;
+        color: var(--accent);
+        font-weight: bold;
+    }
+
+    .users-list, .messages-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .user-item, .message-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1em;
+        margin: 0.5em 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .admin-controls {
+        display: flex;
+        gap: 0.5em;
+    }
+
+    .page-content {
+        display: none;
+        margin: 2em auto;
+        max-width: 1200px;
+        padding: 2em;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #home-page {
+        display: block; 
+    }
+
+    #fun-stuff-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2em;
+    }
+
+    .fun-section {
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        padding: 2em;
+        margin-bottom: 2em;
+    }
+
+    .game-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2em;
+        margin-top: 1em;
+    }
+
+    .game-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1em;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .game-button {
+        margin-top: 1em;
+        padding: 0.5em 1em;
+        border-radius: 5px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1em;
+        margin-top: 1em;
+    }
+
+    .effect-button {
+        padding: 1em 2em;
+        border: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .effect-button.ripple {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .effect-button.ripple:after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(0);
+        transition: transform 0.3s ease;
+    }
+
+    .effect-button.ripple:hover:after {
+        transform: scale(2);
+        opacity: 0;
+    }
+
+    .effect-button.neon {
+        border: 2px solid var(--accent);
+        box-shadow: 0 0 5px var(--accent);
+    }
+
+    .effect-button.neon:hover {
+        box-shadow: 0 0 20px var(--accent);
+        text-shadow: 0 0 5px var(--accent);
+    }
+
+    .effect-button.bubble:hover {
+        transform: scale(1.1);
+        animation: bubble 0.4s ease-out;
+    }
+
+    .effect-button.shake:hover {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .effect-button.bounce:hover {
+        animation: bounce 0.5s ease-in-out;
+    }
+
+    .effect-button.glitch:hover {
+        animation: glitch 0.3s ease-in-out infinite;
+    }
+
+    .effect-button.shadow-pulse:hover {
+        animation: shadowPulse 1s ease-in-out infinite;
+    }
+
+    .effect-button.rainbow {
+        background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+        background-size: 700% 100%;
+    }
+
+    .effect-button.rainbow:hover {
+        animation: rainbow 2s linear infinite;
+    }
+
+    @keyframes bubble {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1.1); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes glitch {
+        0% { transform: translate(0); }
+        25% { transform: translate(-5px, 5px); }
+        50% { transform: translate(5px, -5px); }
+        75% { transform: translate(-5px, -5px); }
+        100% { transform: translate(0); }
+    }
+
+    @keyframes shadowPulse {
+        0% { box-shadow: 0 0 5px var(--accent); }
+        50% { box-shadow: 0 0 20px var(--accent); }
+        100% { box-shadow: 0 0 5px var(--accent); }
+    }
+
+    @keyframes rainbow {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+    }
+
+    #snake-game {
+        background: #000;
+        border-radius: 5px;
+    }
+
+    .tictactoe-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        width: 300px;
+        margin: 0 auto;
+    }
+
+    .tictactoe-cell {
+        background: rgba(255, 255, 255, 0.1);
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2em;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: rgba(20, 20, 20, 0.95);
+        margin: 10% auto;
+        padding: 2em;
+        border: 1px solid var(--accent);
+        border-radius: 15px;
+        width: 80%;
+        max-width: 500px;
+        position: relative;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: var(--accent);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .profile-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .profile-picture-section {
+        text-align: center;
+        margin-bottom: 1em;
+    }
+
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin-bottom: 1em;
+        object-fit: cover;
+        border: 2px solid var(--accent);
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .glitch-style {
+        background: linear-gradient(45deg, #ff0000, #000);
+        animation: glitch 0.5s infinite;
+    }
+
+    .glitch2-style {
+        background: #000;
+        position: relative;
+        animation: severe-glitch 1s infinite;
+        text-shadow: 2px 2px #ff0000, -2px -2px #00ff00;
+    }
+
+    @keyframes severe-glitch {
+        0% { 
+            transform: translate(0) skew(0deg); 
+            filter: hue-rotate(0deg); 
+        }
+        20% { 
+            transform: translate(-2px, 1px) skew(-2deg); 
+            filter: hue-rotate(90deg); 
+        }
+        40% { 
+            transform: translate(2px, -1px) skew(2deg); 
+            filter: hue-rotate(180deg); 
+        }
+        60% { 
+            transform: translate(-1px, 1px) skew(-1deg); 
+            filter: hue-rotate(270deg); 
+        }
+        80% { 
+            transform: translate(1px, -1px) skew(1deg); 
+            filter: hue-rotate(360deg); 
+        }
+        100% { 
+            transform: translate(0) skew(0deg); 
+        }
+    }
+
+    .vaporwave-style {
+        background: linear-gradient(45deg, #ff00ff, #00ffff);
+        color: #fff;
+        text-shadow: 2px 2px #ff00ff;
+    }
+
+    .synthwave-style {
+        background: linear-gradient(45deg, #ff0099, #6600ff);
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .synthwave-style::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            rgba(255, 0, 153, 0.2) 2px,
+            transparent 4px
+        );
+        pointer-events: none;
+    }
+
+    .matrix-style {
+        background: #000;
+        color: #00ff00;
+        text-shadow: 0 0 5px #00ff00;
+        font-family: 'Courier New', monospace;
+    }
+
+    .neon-style {
+        background: #000;
+        color: #fff;
+        text-shadow: 0 0 5px #fff, 
+                     0 0 10px #fff, 
+                     0 0 15px #ff00ff,
+                     0 0 20px #ff00ff;
+    }
+
+    .gothic-style {
+        background: linear-gradient(45deg, #2c1810, #000);
+        color: #8b0000;
+        text-shadow: 0 0 5px #800000;
+    }
+
+    .steampunk-style {
+        background: linear-gradient(45deg, #b5a642, #8b4513);
+        color: #cd853f;
+        border-color: #daa520;
+    }
+
+    .space-style {
+        background: #000033 url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='1' fill='white' opacity='0.5'/%3E%3C/svg%3E");
+        color: #fff;
+    }
+
+    .cyber-punk-style {
+        background: linear-gradient(45deg, #ff00ff, #00ffff);
+        color: #fff;
+        text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff;
+        animation: neonPulse 1s infinite;
+    }
+
+    .retro-wave-style {
+        background: linear-gradient(180deg, #ff1493, #ff4500);
+        color: #fff;
+        text-shadow: 3px 3px #ff1493;
+    }
+
+    .scanner-style {
+        background: #000;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .scanner-style::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background: rgba(0, 255, 0, 0.5);
+        animation: scan 2s linear infinite;
+    }
+
+    .binary-style {
+        background: #000;
+        color: #0f0;
+        position: relative;
+        font-family: monospace;
+    }
+
+    .binary-style::before {
+        content: '01';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.1;
+        font-size: 2em;
+        pointer-events: none;
+    }
+
+    .chrome-style {
+        background: linear-gradient(135deg, #c0c0c0, #ffffff);
+        color: #000;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .pixel-style {
+        background: #000;
+        image-rendering: pixelated;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    .wireframe-style {
+        background: #0a0a0a;
+        background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+        background-size: 50px 50px;
+    }
+
+    @keyframes scan {
+        0% { top: -50%; }
+        100% { top: 150%; }
+    }
+
+    @keyframes neonPulse {
+        0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00ff; }
+        50% { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #00ffff; }
+    }
+
+    @keyframes severe-glitch {
+        0% { 
+            transform: translate(0) skew(0deg); 
+            filter: hue-rotate(0deg); 
+        }
+        20% { 
+            transform: translate(-2px, 1px) skew(-2deg); 
+            filter: hue-rotate(90deg); 
+        }
+        40% { 
+            transform: translate(2px, -1px) skew(2deg); 
+            filter: hue-rotate(180deg); 
+        }
+        60% { 
+            transform: translate(-1px, 1px) skew(-1deg); 
+            filter: hue-rotate(270deg); 
+        }
+        80% { 
+            transform: translate(1px, -1px) skew(1deg); 
+            filter: hue-rotate(360deg); 
+        }
+        100% { 
+            transform: translate(0) skew(0deg); 
+        }
+    }
+</style>
+</head>
+<body class="animated-bg">
+    <div class="navbar">
+        <a href="javascript:void(0)" onclick="showPage('home-page')"><i class="fas fa-home"></i> Home</a>
+        <a href="javascript:void(0)" onclick="showPage('about-page')"><i class="fas fa-info-circle"></i> About</a>
+        <a href="javascript:void(0)" onclick="showPage('music-page')"><i class="fas fa-music"></i> Music</a>
+        <a href="javascript:void(0)" onclick="showPage('chat-page')"><i class="fas fa-comments"></i> Chat</a>
+        <a href="javascript:void(0)" onclick="showPage('forums-page')"><i class="fas fa-users"></i> Page of Nothingness</a>
+        <a href="javascript:void(0)" onclick="showPage('fun-stuff-page')"><i class="fas fa-gamepad"></i> Fun Stuff</a>
+        <div class="style-dropdown">
+            <button class="gradient-button" onclick="toggleStylesDropdown()">
+                <i class="fas fa-palette"></i> Styles
+            </button>
+            <div id="styles-menu" class="styles-dropdown-content">
+                <a href="#" onclick="changeStyle('glitch')">Glitch</a>
+                <a href="#" onclick="changeStyle('glitch2')">Glitch 2.0</a>
+                <a href="#" onclick="changeStyle('vaporwave')">Vaporwave</a>
+                <a href="#" onclick="changeStyle('synthwave')">Synthwave</a>
+                <a href="#" onclick="changeStyle('matrix')">Matrix</a>
+                <a href="#" onclick="changeStyle('neon')">Neon</a>
+                <a href="#" onclick="changeStyle('gothic')">Gothic</a>
+                <a href="#" onclick="changeStyle('steampunk')">Steampunk</a>
+                <a href="#" onclick="changeStyle('space')">Space</a>
+                <a href="#" onclick="changeStyle('hacker')">Hacker</a>
+                <a href="#" onclick="changeStyle('holographic')">Holographic</a>
+                <a href="#" onclick="changeStyle('dark')">Dark Default</a>
+            </div>
+        </div>
+        <div class="style-dropdown">
+            <button class="gradient-button" onclick="toggleStylesDropdown2()">
+                <i class="fas fa-palette"></i> Styles 2
+            </button>
+            <div id="styles-menu-2" class="styles-dropdown-content">
+                <a href="#" onclick="changeStyle('cyber-punk')">Cyber Punk</a>
+                <a href="#" onclick="changeStyle('retro-wave')">Retro Wave</a>
+                <a href="#" onclick="changeStyle('scanner')">Scanner</a>
+                <a href="#" onclick="changeStyle('binary')">Binary Rain</a>
+                <a href="#" onclick="changeStyle('chrome')">Chrome</a>
+                <a href="#" onclick="changeStyle('pixel')">Pixel Art</a>
+                <a href="#" onclick="changeStyle('wireframe')">Wireframe</a>
+                <a href="#" onclick="changeStyle('comic')">Comic Book</a>
+                <a href="#" onclick="changeStyle('sketch')">Hand Drawn</a>
+                <a href="#" onclick="changeStyle('terminal')">Terminal</a>
+                <a href="#" onclick="changeStyle('neon-grid')">Neon Grid</a>
+                <a href="#" onclick="changeStyle('glitch-art')">Glitch Art</a>
+                <a href="#" onclick="changeStyle('static')">Static TV</a>
+                <a href="#" onclick="changeStyle('blueprint')">Blueprint</a>
+                <a href="#" onclick="changeStyle('abstract')">Abstract</a>
+            </div>
+        </div>
+        <button id="auth-button" class="gradient-button">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+        <div class="profile-dropdown" id="profile-dropdown" style="display: none;">
+            <button class="gradient-button" onclick="toggleProfileModal()">
+                <i class="fas fa-user-edit"></i> Edit Profile
+            </button>
+            <button class="gradient-button" onclick="showPage('admin-page')">
+                <i class="fas fa-shield-alt"></i> Admin Panel
+            </button>
+        </div>
+    </div>
+
+    <div id="home-page" class="page-content">
+        <div class="welcome-box">
+            <div class="welcome-content">
+                <h2><i class="fas fa-hand-wave"></i> Welcome to Our Community!</h2>
+                <p>Share your thoughts, connect with others, and explore all our features. Get started by signing in and refreshing your page and scroll down to the forums</p>
+                <div class="welcome-features">
+                    <div><i class="fas fa-edit"></i> Create Posts</div>
+                    <div><i class="fas fa-comment"></i> Join Discussions</div>
+                    <div><i class="fas fa-user"></i> Customize Profile</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h1><i class="fas fa-fire"></i> Welcome to Negative0's Website</h1>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-music feature-icon"></i>
+                    <h3>Music Selection</h3>
+                    <p>Explore our curated playlist and share your favorite tracks with the community.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-users feature-icon"></i>
+                    <h3>Active Forums</h3>
+                    <p>Engage in discussions with like-minded individuals on various topics.</p>
+                </div>
+            </div>
+
+            <div class="announcements-section">
+                <h2><i class="fas fa-bullhorn"></i> Important Announcements</h2>
+                <div id="announcements-container"></div>
+            </div>
+
+            <div class="forum-section">
+                <h2><i class="fas fa-comments"></i> Recent Discussions</h2>
+                
+                <div class="post-form">
+                    <h3>Create New Post</h3>
+                    <input type="text" class="post-input" id="post-title" placeholder="Post Title">
+                    <textarea class="post-input" id="post-content" rows="4" placeholder="What's on your mind?"></textarea>
+                    <button class="gradient-button" onclick="createPost()">Post</button>
+                </div>
+
+                <div id="forum-posts">
+                    <!-- Posts will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="about-page" class="page-content">
+        <h1>About</h1>
+        <p>This is a page that exists yeah no idk what to put here. BuT NeGATiVe THen wHy dId yOu MaKe ThIS AbOuT paGE???         Because i wanted </p>
+    </div>
+
+    <div id="music-page" class="page-content">
+        <h1>Music</h1>
+        <p>This is a Work in Progress.</p>
+    </div>
+
+    <div id="chat-page" class="page-content">
+        <h1>Chat</h1>
+        <p>Maybe will be added but will probably be replaced by the forums</p>
+    </div>
+
+    <div id="forums-page" class="page-content">
+        <h1>Page of Nothingness</h1>
+        <div class="forum-section">
+            <h2>Yeahh i need to remove this page its useless</h2>
+            <!-- Existing forum content to be moved here -->
+        </div>
+    </div>
+
+    <div id="fun-stuff-page" class="page-content">
+        <h1>Fun Stuff</h1>
+        <div class="fun-section minigames">
+            <h2><i class="fas fa-gamepad"></i> Minigames</h2>
+            <div class="game-grid">
+                <div class="game-card" onclick="startGame('snake')">
+                    <h3>Snake</h3>
+                    <canvas id="snake-game" width="300" height="300"></canvas>
+                    <button class="game-button">Play Snake</button>
+                </div>
+                <div class="game-card">
+                    <h3>Tic Tac Toe</h3>
+                    <div id="tictactoe-board" class="tictactoe-grid"></div>
+                    <button class="game-button" onclick="resetTicTacToe()">New Game</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="fun-section button-effects">
+            <h2><i class="fas fa-magic"></i> Button Effects Gallery</h2>
+            <div class="button-grid">
+                <button class="effect-button ripple">Ripple Effect</button>
+                <button class="effect-button neon">Neon Glow</button>
+                <button class="effect-button bubble">Bubble Pop</button>
+                <button class="effect-button shake">Shake</button>
+                <button class="effect-button bounce">Bounce</button>
+                <button class="effect-button glitch">Glitch</button>
+                <button class="effect-button shadow-pulse">Shadow Pulse</button>
+                <button class="effect-button rainbow">Rainbow</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-page" class="page-content">
+        <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+        
+        <div class="admin-grid">
+            <div class="admin-section">
+                <h2><i class="fas fa-bullhorn"></i> Announcements</h2>
+                <div class="post-form">
+                    <input type="text" id="announcement-title" class="post-input" placeholder="Announcement Title">
+                    <textarea id="announcement-content" class="post-input" rows="4" placeholder="Announcement Content"></textarea>
+                    <button class="gradient-button" onclick="createAnnouncement()">Post Announcement</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h2><i class="fas fa-chart-line"></i> Analytics</h2>
+                <div class="analytics-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Active Users</div>
+                        <div id="active-users-count" class="stat-number">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Total Posts</div>
+                        <div id="total-posts-count" class="stat-number">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Total Users</div>
+                        <div id="total-users-count" class="stat-number">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h2><i class="fas fa-users-cog"></i> User Management</h2>
+                <div id="users-list" class="users-list"></div>
+            </div>
+
+            <div class="admin-section">
+                <h2><i class="fas fa-comments"></i> Message Moderation</h2>
+                <div id="messages-list" class="messages-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="social-icons">
+            <a href="https://www.youtube.com/channel/UCTWn1tUqbSNLrCLyunHnlcA"><i class="fab fa-youtube"></i></a>
+            <a href="https://steamcommunity.com/id/-Negative0_Debugged0/"><i class="fab fa-steam"></i></a>
+            <a href="https://discord.gg/kQfVYQuJGt"><i class="fab fa-discord"></i></a>
+        </div>
+        <p>© 2024 Negative0's Website. All rights reserved.</p>
+    </footer>
+
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleProfileModal()">&times;</span>
+            <h2>Edit Profile</h2>
+            <div class="profile-form">
+                <div class="profile-picture-section">
+                    <img id="profile-preview" src="" alt="Profile picture" class="profile-picture">
+                    <input type="file" id="profile-picture-input" accept="image/*" onchange="handleProfilePicture(event)" style="display: none;">
+                    <button class="gradient-button" onclick="document.getElementById('profile-picture-input').click()">
+                        <i class="fas fa-camera"></i> Change Picture
+                    </button>
+                </div>
+                <input type="text" id="display-name" class="post-input" placeholder="Display Name">
+                <textarea id="bio" class="post-input" placeholder="Bio" rows="3"></textarea>
+                <button class="gradient-button" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyBNQpxYTyB3I5s_gG_T5uRwA-asPFRVIgc",
+          authDomain: "zer0s-forums.firebaseapp.com",
+          databaseURL: "https://zer0s-forums-default-rtdb.firebaseio.com",
+          projectId: "zer0s-forums",
+          storageBucket: "zer0s-forums.firebasestorage.app", 
+          messagingSenderId: "640478180419",
+          appId: "1:640478180419:web:5962124bf9c278505e50f6"
+        };
+
+        const adminEmails = [
+          "negative0.debugged0@gmail.com"
+        ];
+
+        let currentUser = null;
+        let isAdmin = false;
+        let auth;
+        let database;
+        let postsRef;
+        let room;
+
+        async function initializeFirebase() {
+          try {
+            if (!firebase.apps.length) {
+              firebase.initializeApp(firebaseConfig);
+            }
+
+            room = new WebsimSocket();
+            room.onPeersChanged = (peers) => {
+              const activeUsersElement = document.getElementById('active-users-count');
+              if (activeUsersElement) {
+                activeUsersElement.textContent = Object.keys(peers).length;
+              }
+            };
+
+            auth = firebase.auth();
+            database = firebase.database();
+            postsRef = database.ref('posts');
+
+            auth.onAuthStateChanged((user) => {
+              currentUser = user;
+              if (user) {
+                console.log('User signed in:', user.displayName);
+                isAdmin = adminEmails && adminEmails.includes(user.email);
+                updateUIForAuth();
+                showNotification(`Welcome back, ${user.displayName}!`, 'success');
+              } else {
+                console.log('User signed out');
+                isAdmin = false;
+                updateUIForAuth();
+              }
+            });
+
+            postsRef.on('value', (snapshot) => {
+              const data = snapshot.val();
+              if (data) {
+                posts = Object.entries(data)
+                  .map(([id, post]) => ({...post, id}))
+                  .sort((a, b) => b.timestamp - a.timestamp);
+                updatePosts();
+                updateAnalytics();
+              } else {
+                posts = [];
+                updatePosts();
+                updateAnalytics();
+              }
+            });
+
+            const analyticsRef = database.ref('analytics');
+            analyticsRef.on('value', (snapshot) => {
+                const analyticsData = snapshot.val() || {};
+                updateAnalytics(analyticsData);
+            });
+
+            analyticsRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    analyticsRef.set({
+                        activeUsers: 0,
+                        reportedPosts: 0,
+                        lastUpdated: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            });
+
+          } catch (error) {
+            console.error("Firebase initialization error:", error);
+            handleFirebaseError(error);
+          }
+        }
+
+        function updateAnalytics(analyticsData = {}) {
+            userCount = analyticsData?.activeUsers || 0;
+            reportedCount = analyticsData?.reportedPosts || 0;
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+
+        function updateUIForAuth() {
+            const authButton = document.getElementById('auth-button');
+            const profileDropdown = document.getElementById("profile-dropdown");
+            if (currentUser) {
+                authButton.innerHTML = `<i class="fas fa-sign-out-alt"></i> Sign Out`;
+                authButton.onclick = signOut;
+                profileDropdown.style.display = "inline-block";
+                
+                profileDropdown.innerHTML = `
+                    <button class="gradient-button" onclick="toggleProfileModal()">
+                        <i class="fas fa-user-edit"></i> Edit Profile
+                    </button>
+                    ${isAdmin ? `
+                        <button class="gradient-button" onclick="showPage('admin-page')">
+                            <i class="fas fa-shield-alt"></i> Admin Panel
+                        </button>
+                    ` : ''}
+                `;
+            } else {
+                authButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> Sign In`;
+                authButton.onclick = signIn;
+                profileDropdown.style.display = "none";
+            }
+        }
+
+        function signIn() {
+            if (!auth) {
+                showNotification('Authentication service not available', 'error');
+                return;
+            }
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    showNotification(`Welcome ${user.displayName}!`, 'success');
+                })
+                .catch((error) => {
+                    console.error('Sign in error:', error);
+                    handleFirebaseError(error);
+                });
+        }
+
+        function signOut() {
+            if (!auth) {
+                showNotification('Authentication service not available', 'error');
+                return;
+            }
+
+            auth.signOut()
+                .then(() => {
+                    showNotification('Signed out successfully', 'success');
+                })
+                .catch((error) => {
+                    console.error('Sign out error:', error);
+                    handleFirebaseError(error);
+                });
+        }
+
+        let posts = [];
+
+        function createPost() {
+            if (!auth || !currentUser) {
+                showNotification('Please sign in to post', 'error');
+                return;
+            }
+
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+
+            if (!title || !content) {
+                showNotification('Please fill in both title and content', 'error');
+                return;
+            }
+
+            const userRef = database.ref(`users/${currentUser.uid}`);
+            userRef.once('value').then((snapshot) => {
+                const userData = snapshot.val() || {};
+
+                const post = {
+                    title: title.trim(),
+                    content: embedImages(content.trim()),
+                    author: userData.displayName || currentUser.displayName || 'Anonymous',
+                    authorId: currentUser.uid,
+                    authorPhotoURL: userData.photoURL || currentUser.photoURL || '',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    isAdminPost: isAdmin,
+                    type: 'post',
+                    parentId: null,
+                    replies: {},
+                    lastReplyTimestamp: null
+                };
+
+                postsRef.push(post)
+                    .then(() => {
+                        clearForm();
+                        showNotification('Post created successfully!', 'success');
+                    })
+                    .catch((error) => {
+                        console.error('Error creating post:', error);
+                        showNotification('Error creating post. Please try again.', 'error');
+                    });
+            });
+        }
+
+        function updatePosts() {
+            const postsContainer = document.getElementById('forum-posts');
+            const regularPosts = posts.filter(post => post.type !== 'announcement' && !post.parentId);
+
+            postsContainer.innerHTML = regularPosts.map(post => `
+                <div class="forum-post ${post.isAdminPost ? 'admin-post' : ''} ${post.isPinned ? 'pinned-post' : ''}">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="author-avatar">
+                                ${post.authorPhotoURL ? 
+                                    `<img src="${post.authorPhotoURL}" alt="avatar">` :
+                                    `<i class="fas fa-user"></i>`
+                                }
+                            </div>
+                            <div>
+                                <h4>${post.author}</h4>
+                                <small>${new Date(post.timestamp).toLocaleString()}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>${post.title}</h3>
+                    <p>${post.content}</p>
+                    
+                    <div class="post-footer">
+                        <button class="gradient-button small" onclick="showReplyForm('${post.id}')">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                        <span class="reply-count">
+                            ${Object.keys(post.replies || {}).length} replies
+                        </span>
+                        <button class="gradient-button small" onclick="toggleReplies('${post.id}')">
+                            <i class="fas fa-comments"></i> Show Replies
+                        </button>
+                    </div>
+                    
+                    <div id="replies-${post.id}" class="replies-container" style="display: none;">
+                        <div id="reply-form-${post.id}" style="display: none;">
+                            <textarea class="post-input" id="reply-content-${post.id}" rows="3" placeholder="Write your reply..."></textarea>
+                            <button class="gradient-button" onclick="submitReply('${post.id}')">Submit Reply</button>
+                        </div>
+                        <div id="replies-list-${post.id}" class="replies-list"></div>
+                    </div>
+                </div>
+            `).join('');
+            updateAnnouncements();
+        }
+
+        function updateAnnouncements() {
+            const container = document.getElementById('announcements-container');
+            const announcementPosts = posts.filter(post => post.type === 'announcement')
+                .sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (announcementPosts.length === 0) {
+                container.innerHTML = `
+                    <div class="announcement">
+                        <p><i class="fas fa-info-circle"></i> No announcements yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = announcementPosts.map(announcement => `
+                <div class="announcement" id="announcement-${announcement.id}">
+                    <div class="announcement-header">
+                        <div class="announcement-meta">
+                            <span class="announcement-title">
+                                <i class="fas fa-bullhorn"></i> ${announcement.title}
+                            </span>
+                            <div class="announcement-author">
+                                <div class="author-avatar">
+                                    ${announcement.authorPhotoURL ? 
+                                        `<img src="${announcement.authorPhotoURL}" alt="avatar">` :
+                                        `<i class="fas fa-user"></i>`
+                                    }
+                                </div>
+                                <span>${announcement.author}</span>
+                            </div>
+                        </div>
+                        <div class="announcement-controls">
+                            <small title="Posted on">
+                                <i class="fas fa-clock"></i>
+                                ${new Date(announcement.timestamp).toLocaleString()}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="announcement-content">
+                        ${announcement.content}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showReplyForm(postId) {
+            if (!currentUser) {
+                showNotification('Please sign in to reply', 'error');
+                return;
+            }
+            document.getElementById(`reply-form-${postId}`).style.display = 'block';
+        }
+
+        function toggleReplies(postId) {
+            const repliesContainer = document.getElementById(`replies-${postId}`);
+            if (repliesContainer.style.display === 'none') {
+                repliesContainer.style.display = 'block';
+                loadReplies(postId);
+            } else {
+                repliesContainer.style.display = 'none';
+            }
+        }
+
+        function loadReplies(postId) {
+            const repliesList = document.getElementById(`replies-list-${postId}`);
+            const replies = posts.filter(post => post.parentId === postId)
+                .sort((a, b) => a.timestamp - b.timestamp);
+            
+            repliesList.innerHTML = replies.map(reply => `
+                <div class="reply-post">
+                    <div class="post-author">
+                        <div class="author-avatar">
+                            ${reply.authorPhotoURL ? 
+                                `<img src="${reply.authorPhotoURL}" alt="avatar">` :
+                                `<i class="fas fa-user"></i>`
+                            }
+                        </div>
+                        <div>
+                            <h4>${reply.author}</h4>
+                            <small>${new Date(reply.timestamp).toLocaleString()}</small>
+                        </div>
+                    </div>
+                    <p>${reply.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function submitReply(postId) {
+            const content = document.getElementById(`reply-content-${postId}`).value;
+            
+            if (!content.trim()) {
+                showNotification('Reply cannot be empty', 'error');
+                return;
+            }
+
+            const userRef = database.ref(`users/${currentUser.uid}`);
+            userRef.once('value').then((snapshot) => {
+                const userData = snapshot.val() || {};
+
+                const reply = {
+                    content: embedImages(content.trim()),
+                    author: userData.displayName || currentUser.displayName || 'Anonymous',
+                    authorId: currentUser.uid,
+                    authorPhotoURL: userData.photoURL || currentUser.photoURL || '',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    isAdminPost: isAdmin,
+                    type: 'reply',
+                    parentId: postId
+                };
+
+                postsRef.push(reply)
+                    .then(() => {
+                        document.getElementById(`reply-content-${postId}`).value = '';
+                        document.getElementById(`reply-form-${postId}`).style.display = 'none';
+                        
+                        const parentPost = posts.find(p => p.id === postId);
+                        if (parentPost) {
+                            postsRef.child(postId).update({
+                                replies: {
+                                    ...parentPost.replies,
+                                    [Date.now()]: true
+                                },
+                                lastReplyTimestamp: firebase.database.ServerValue.TIMESTAMP
+                            });
+                        }
+                        
+                        showNotification('Reply posted successfully', 'success');
+                        loadReplies(postId);
+                    })
+                    .catch(error => {
+                        console.error('Error posting reply:', error);
+                        showNotification('Error posting reply', 'error');
+                    });
+            });
+        }
+
+        function clearForm() {
+            document.getElementById('post-title').value = '';
+            document.getElementById('post-content').value = '';
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                const element = document.querySelector(href);
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        function toggleStylesDropdown() {
+            const menu = document.getElementById('styles-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleStylesDropdown2() {
+            const menu = document.getElementById('styles-menu-2');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function changeStyle(style) {
+            const allStyles = [
+                'glitch-style', 
+                'glitch2-style',
+                'vaporwave-style',
+                'synthwave-style',
+                'matrix-style',
+                'neon-style',
+                'gothic-style',
+                'steampunk-style',
+                'space-style',
+                'cyber-punk-style',
+                'retro-wave-style',
+                'scanner-style',
+                'binary-style',
+                'chrome-style',
+                'pixel-style',
+                'wireframe-style'
+            ];
+            
+            // Remove all existing styles
+            document.body.classList.remove(...allStyles);
+            
+            // Add new style if not "dark" (default)
+            if(style !== 'dark') {
+                document.body.classList.add(`${style}-style`);
+            }
+            
+            // Close dropdowns
+            document.getElementById('styles-menu').style.display = 'none';
+            document.getElementById('styles-menu-2').style.display = 'none';
+            
+            // Save preference
+            localStorage.setItem('preferred-style', style);
+        }
+
+        const savedStyle = localStorage.getItem('preferred-style');
+        if (savedStyle) {
+            changeStyle(savedStyle);
+        }
+
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('.style-dropdown button')) {
+                const dropdowns = document.getElementsByClassName('styles-dropdown-content');
+                for (const dropdown of dropdowns) {
+                    if (dropdown.style.display === 'block') {
+                        dropdown.style.display = 'none';
+                    }
+                }
+            }
+        });
+
+        function toggleProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+            
+            if (modal.style.display === 'block' && currentUser) {
+                const userRef = database.ref(`users/${currentUser.uid}`);
+                userRef.once('value').then((snapshot) => {
+                    const userData = snapshot.val() || {};
+                    document.getElementById('display-name').value = userData.displayName || currentUser.displayName || '';
+                    document.getElementById('bio').value = userData.bio || '';
+                    document.getElementById('profile-preview').src = userData.photoURL || currentUser.photoURL || '';
+                });
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('profile-modal');
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        async function handleProfilePicture(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const url = await websim.upload(file);
+                document.getElementById('profile-preview').src = url;
+            } catch (error) {
+                console.error('Error uploading profile picture:', error);
+                showNotification('Error uploading image', 'error');
+            }
+        }
+
+        async function saveProfile() {
+            const displayName = document.getElementById('display-name').value;
+            const bio = document.getElementById('bio').value;
+            const photoURL = document.getElementById('profile-preview').src;
+            
+            const userRef = database.ref(`users/${currentUser.uid}`);
+            try {
+                await userRef.update({
+                    displayName,
+                    bio,
+                    photoURL
+                });
+                showNotification('Profile updated successfully', 'success');
+                toggleProfileModal();
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showNotification('Error updating profile', 'error');
+            }
+        }
+
+        function embedImages(content) {
+            return content.replace(/(https?:\/\/[^\s<]+(?:jpg|jpeg|png|gif))/gi, 
+                '<img src="$1" class="embedded-image" alt="User shared image">');
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+
+        // Fun Stuff JavaScript
+        function startGame(game) {
+            switch(game) {
+                case 'snake':
+                    initSnakeGame();
+                    break;
+            }
+        }
+
+        // Snake Game
+        function initSnakeGame() {
+            const canvas = document.getElementById('snake-game');
+            const ctx = canvas.getContext('2d');
+            
+            let snake = [
+                {x: 150, y: 150},
+                {x: 140, y: 150},
+                {x: 130, y: 150},
+            ];
+            
+            let food = {
+                x: Math.floor(Math.random() * 29) * 10 + 10,
+                y: Math.floor(Math.random() * 29) * 10 + 10
+            };
+            
+            let dx = 10;
+            let dy = 0;
+            
+            document.addEventListener('keydown', changeDirection);
+            
+            function changeDirection(event) {
+                const LEFT = 37;
+                const RIGHT = 39;
+                const UP = 38;
+                const DOWN = 40;
+                
+                const keyPressed = event.keyCode;
+                
+                if (keyPressed === LEFT && dx === 0) {
+                    dx = -10;
+                    dy = 0;
+                }
+                if (keyPressed === UP && dy === 0) {
+                    dx = 0;
+                    dy = -10;
+                }
+                if (keyPressed === RIGHT && dx === 0) {
+                    dx = 10;
+                    dy = 0;
+                }
+                if (keyPressed === DOWN && dy === 0) {
+                    dx = 0;
+                    dy = 10;
+                }
+            }
+            
+            function drawGame() {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'red';
+                ctx.fillRect(food.x, food.y, 10, 10);
+                
+                snake.forEach(segment => {
+                    ctx.fillStyle = 'lime';
+                    ctx.fillRect(segment.x, segment.y, 10, 10);
+                });
+                
+                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                snake.unshift(head);
+                
+                if (head.x === food.x && head.y === food.y) {
+                    food = {
+                        x: Math.floor(Math.random() * 29) * 10 + 10,
+                        y: Math.floor(Math.random() * 29) * 10 + 10
+                    };
+                } else {
+                    snake.pop();
+                }
+                
+                if (head.x < 0 || head.x >= canvas.width || 
+                    head.y < 0 || head.y >= canvas.height ||
+                    snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
+                    clearInterval(gameLoop);
+                    alert('Game Over!');
+                    return;
+                }
+            }
+            
+            const gameLoop = setInterval(drawGame, 100);
+        }
+
+        // Tic Tac Toe
+        function initTicTacToe() {
+            const board = document.getElementById('tictactoe-board');
+            board.innerHTML = '';
+            
+            for(let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'tictactoe-cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleTicTacToeClick);
+                board.appendChild(cell);
+            }
+        }
+
+        let currentPlayer = 'X';
+        let gameBoard = Array(9).fill('');
+
+        function handleTicTacToeClick(e) {
+            const index = e.target.dataset.index;
+            if (gameBoard[index]) return;
+            
+            gameBoard[index] = currentPlayer;
+            e.target.textContent = currentPlayer;
+            
+            if (checkWin()) {
+                alert(`Player ${currentPlayer} wins!`);
+                resetTicTacToe();
+                return;
+            }
+            
+            if (gameBoard.every(cell => cell)) {
+                alert('Draw!');
+                resetTicTacToe();
+                return;
+            }
+            
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+
+        function checkWin() {
+            const winPatterns = [
+                [0,1,2], [3,4,5], [6,7,8],
+                [0,3,6], [1,4,7], [2,5,8],
+                [0,4,8], [2,4,6]
+            ];
+            
+            return winPatterns.some(pattern => {
+                return pattern.every(index => {
+                    return gameBoard[index] === currentPlayer;
+                });
+            });
+        }
+
+        function resetTicTacToe() {
+            gameBoard = Array(9).fill('');
+            currentPlayer = 'X';
+            initTicTacToe();
+        }
+
+        function showPage(pageId) {
+            if (pageId === 'admin-page' && !isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.style.display = 'block';
+                
+                switch(pageId) {
+                    case 'home-page':
+                        document.body.style.background = 'linear-gradient(135deg, var(--primary-red), #000000)';
+                        break;
+                    case 'about-page':
+                        document.body.style.background = 'linear-gradient(135deg, #4B0082, #000000)';
+                        break;
+                    case 'music-page':
+                        document.body.style.background = 'linear-gradient(135deg, #006400, #000000)';
+                        break;
+                    case 'chat-page':
+                        document.body.style.background = 'linear-gradient(135deg, #00008B, #000000)';
+                        break;
+                    case 'forums-page':
+                        document.body.style.background = 'linear-gradient(135deg, #8B0000, #000000)';
+                        break;
+                    case 'fun-stuff-page':
+                        document.body.style.background = 'linear-gradient(135deg, #9932CC, #000000)';
+                        initTicTacToe();
+                        break;
+                    case 'admin-page':
+                        if (isAdmin) {
+                            updateAdminPanel();
+                        }
+                        break;
+                }
+            }
+        }
+
+        function createAnnouncement() {
+            if (!isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('announcement-title').value;
+            const content = document.getElementById('announcement-content').value;
+            
+            if (!title || !content) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            const announcement = {
+                title,
+                content,
+                author: currentUser.displayName,
+                authorId: currentUser.uid,
+                authorPhotoURL: currentUser.photoURL,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                type: 'announcement'
+            };
+            
+            postsRef.push(announcement)
+                .then(() => {
+                    document.getElementById('announcement-title').value = '';
+                    document.getElementById('announcement-content').value = '';
+                    showNotification('Announcement posted successfully', 'success');
+                })
+                .catch(error => {
+                    console.error('Error posting announcement:', error);
+                    showNotification('Error posting announcement', 'error');
+                });
+        }
+
+        function updateAdminPanel() {
+            if (!isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+
+            database.ref('users').once('value', snapshot => {
+                const totalUsers = snapshot.numChildren();
+                document.getElementById('total-users-count').textContent = totalUsers;
+            });
+            
+            const totalPosts = posts ? posts.length : 0;
+            document.getElementById('total-posts-count').textContent = totalPosts;
+            
+            const activeUsers = room && room.party ? Object.keys(room.party.peers).length : 0;
+            document.getElementById('active-users-count').textContent = activeUsers;
+
+            database.ref('users').on('value', snapshot => {
+                const usersList = document.getElementById('users-list');
+                usersList.innerHTML = '';
+                
+                snapshot.forEach(userSnap => {
+                    const user = userSnap.val();
+                    usersList.innerHTML += `
+                        <div class="user-item">
+                            <div class="user-info">
+                                <img src="${user.photoURL || 'default-avatar.png'}" alt="avatar" class="small-avatar">
+                                <span>${user.displayName}</span>
+                            </div>
+                            <div class="admin-controls">
+                                <button class="gradient-button small" onclick="banUser('${userSnap.key}')">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                <button class="gradient-button small" onclick="deleteUser('${userSnap.key}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+            postsRef.on('value', snapshot => {
+                const messagesList = document.getElementById('messages-list');
+                messagesList.innerHTML = '';
+                
+                snapshot.forEach(postSnap => {
+                    const post = postSnap.val();
+                    messagesList.innerHTML += `
+                        <div class="message-item">
+                            <div class="message-content">
+                                <strong>${post.title || 'Reply'}</strong>
+                                <p>${post.content}</p>
+                            </div>
+                            <div class="admin-controls">
+                                <button class="gradient-button small" onclick="editMessage('${postSnap.key}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="gradient-button small" onclick="deleteMessage('${postSnap.key}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        function banUser(uid) {
+            if (!isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+            database.ref(`users/${uid}/banned`).set(true)
+                .then(() => showNotification('User banned successfully', 'success'))
+                .catch(error => showNotification('Error banning user', 'error'));
+        }
+
+        function deleteUser(uid) {
+            if (!isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+            database.ref(`users/${uid}`).remove()
+                .then(() => showNotification('User deleted successfully', 'success'))
+                .catch(error => showNotification('Error deleting user', 'error'));
+        }
+
+        function editMessage(postId) {
+            if (!isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+            // Implement edit functionality
+        }
+
+        function deleteMessage(postId) {
+            if (!isAdmin) {
+                showNotification('Access denied: Admin privileges required', 'error');
+                return;
+            }
+            postsRef.child(postId).remove()
+                .then(() => showNotification('Message deleted successfully', 'success'))
+                .catch(error => showNotification('Error deleting message', 'error'));
+        }
+    </script>
+</body>
+</html>
