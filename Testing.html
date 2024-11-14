@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zer0's Chat with Firebase</title>
+  <style>
+    /* Include all original CSS here */
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <a href="https://negative0debuged0.github.io">Home</a>
+  </div>
+
+  <div class="chat-container">
+    <h1>Zer0's Chat</h1>
+
+    <div id="chatArea">
+      <!-- Google Login Section -->
+      <div id="googleLoginSection">
+        <button id="googleLoginButton">Login with Google</button>
+      </div>
+
+      <!-- User Info Section (shown after login) -->
+      <div id="userInfoSection" style="display: none;">
+        <div id="userNameDisplay">Logged in as: <span id="userName"></span></div>
+        <button id="logoutButton">Logout</button>
+      </div>
+
+      <!-- Admin Login Section (if needed) -->
+      <div id="adminLogin" style="display: none;">
+        <div id="adminLoginForm" style="display: block;">
+          <input type="password" id="adminPassword" placeholder="Enter admin password">
+          <button id="adminLoginButton">Login as Admin</button>
+        </div>
+        <div id="adminLoggedIn" style="display: none;">
+          <div class="admin-status">Logged in as Admin</div>
+          <button id="adminLogoutButton">Logout</button>
+        </div>
+      </div>
+
+      <!-- Chat Input and Messages Section -->
+      <div id="messages"></div>
+      <textarea id="messageInput" placeholder="Type a message..." rows="4"></textarea><br>
+      <button id="sendMessageButton">Send Message</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK and Authentication -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBNQpxYTyB3I5s_gG_T5uRwA-asPFRVIgc",
+      authDomain: "zer0s-forums.firebaseapp.com",
+      projectId: "zer0s-forums",
+      storageBucket: "zer0s-forums.firebasestorage.app",
+      messagingSenderId: "640478180419",
+      appId: "1:640478180419:web:5962124bf9c278505e50f6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const ADMIN_PASSWORD = "10242048";
+    let currentMessages = [];
+    let userName = '';
+    let isAdmin = false;
+
+    // Fetch Messages from Firestore
+    const fetchMessages = async () => {
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.innerHTML = ''; // Clear messages
+
+      const messagesRef = collection(db, 'messages');
+      const q = query(messagesRef, orderBy('timestamp'));
+      const querySnapshot = await getDocs(q);
+
+      currentMessages = [];
+      querySnapshot.forEach(doc => {
+        const messageData = doc.data();
+        messageData.id = doc.id;
+        currentMessages.push(messageData);
+      });
+      displayMessages(currentMessages);
+    };
+
+    // Display Messages on the Page
+    const displayMessages = (messages) => {
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.innerHTML = '';
+      messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        
+        const messageText = document.createElement('p');
+        messageText.innerText = `${message.sender}: ${message.text}`;
+        messageDiv.appendChild(messageText);
+
+        const timestamp = document.createElement('span');
+        timestamp.classList.add('timestamp');
+        timestamp.innerText = new Date(message.timestamp.toDate()).toLocaleString();
+        messageDiv.appendChild(timestamp);
+
+        if (isAdmin) {
+          const editButton = document.createElement('button');
+          editButton.innerText = "Edit";
+          editButton.onclick = () => editMessage(message.id);
+          messageDiv.appendChild(editButton);
+
+          const deleteButton = document.createElement('button');
+          deleteButton.innerText = "Delete";
+          deleteButton.onclick = () => deleteMessage(message.id);
+          messageDiv.appendChild(deleteButton);
+        }
+
+        messagesDiv.appendChild(messageDiv);
+      });
+    };
+
+    // Send Message to Firestore
+    const sendMessage = async () => {
+      const messageInput = document.getElementById('messageInput');
+      const messageText = messageInput.value.trim();
+      if (messageText) {
+        await addDoc(collection(db, 'messages'), {
+          sender: userName || 'Anonymous',
+          text: messageText,
+          timestamp: new Date(),
+        });
+        messageInput.value = '';
+        fetchMessages();
+      }
+    };
+
+    // Google Sign-In
+    const handleGoogleLogin = () => {
+      signInWithPopup(auth, provider)
+        .then(result => {
+          const user = result.user;
+          userName = user.displayName || 'Anonymous';
+          document.getElementById('userName').textContent = userName;
+          document.getElementById('googleLoginSection').style.display = 'none';
+          document.getElementById('userInfoSection').style.display = 'block';
+          fetchMessages();
+        })
+        .catch(error => {
+          console.error("Error logging in with Google:", error);
+        });
+    };
+
+    // Google Logout
+    const handleLogout = () => {
+      signOut(auth).then(() => {
+        document.getElementById('userInfoSection').style.display = 'none';
+        document.getElementById('googleLoginSection').style.display = 'block';
+        userName = '';
+        document.getElementById('messages').innerHTML = '';
+      }).catch(error => {
+        console.error("Error logging out:", error);
+      });
+    };
+
+    // Monitor Auth State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userName = user.displayName || 'Anonymous';
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('googleLoginSection').style.display = 'none';
+        document.getElementById('userInfoSection').style.display = 'block';
+        fetchMessages();
+      } else {
+        document.getElementById('userInfoSection').style.display = 'none';
+        document.getElementById('googleLoginSection').style.display = 'block';
+      }
+    });
+
+    // Admin Functions
+    const handleAdminLogin = () => {
+      const passwordInput = document.getElementById('adminPassword');
+      const password = passwordInput.value.trim();
+      if (password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        document.getElementById('adminLoginForm').style.display = 'none';
+        document.getElementById('adminLoggedIn').style.display = 'block';
+      } else {
+        alert('Incorrect admin password');
+      }
+    };
+
+    const handleAdminLogout = () => {
+      isAdmin = false;
+      document.getElementById('adminLoginForm').style.display = 'block';
+      document.getElementById('adminLoggedIn').style.display = 'none';
+      fetchMessages();
+    };
+
+    const editMessage = async (messageId) => {
+      if (!isAdmin) return;
+      const newText = prompt('Edit message:');
+      if (newText) {
+        const messageRef = doc(db, 'messages', messageId);
+        await updateDoc(messageRef, { text: newText });
+        fetchMessages();
+      }
+    };
+
+    const deleteMessage = async (messageId) => {
+      if (!isAdmin) return;
+      if (confirm('Are you sure you want to delete this message?')) {
+        const messageRef = doc(db, 'messages', messageId);
+        await deleteDoc(messageRef);
+        fetchMessages();
+      }
+    };
+
+    document.getElementById('sendMessageButton').addEventListener('click', sendMessage);
+    document.getElementById('googleLoginButton').addEventListener('click', handleGoogleLogin);
+    document.getElementById('logoutButton').addEventListener('click', handleLogout);
+    document.getElementById('adminLoginButton').addEventListener('click', handleAdminLogin);
+    document.getElementById('adminLogoutButton').addEventListener('click', handleAdminLogout);
+
+    // Initial load of messages if already signed in
+    fetchMessages();
+  </script>
+
+</body>
+</html>
