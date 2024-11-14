@@ -5,121 +5,160 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zer0's Chat with Firebase</title>
   <style>
-    /* Include all original CSS here */
+    /* General styles for the page layout and theming */
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1c2c, #4b1248);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chat-container {
+      max-width: 800px;
+      width: 100%;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    #googleLoginSection, #userInfoSection {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    #messages {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    .message {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      transition: transform 0.2s ease;
+    }
+    .message:hover {
+      transform: translateX(5px);
+    }
+    .timestamp {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      display: block;
+      margin-top: 0.5rem;
+    }
+    button {
+      background: linear-gradient(45deg, #9f5cc4, #5c4cc4);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    #messageInput {
+      width: 100%;
+      padding: 1rem;
+      margin: 1rem 0;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      resize: none;
+      transition: all 0.3s ease;
+    }
+    #messageInput:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 10px rgba(159, 92, 196, 0.3);
+    }
   </style>
 </head>
 <body>
 
-  <div class="navbar">
-    <a href="https://negative0debuged0.github.io">Home</a>
-  </div>
-
   <div class="chat-container">
     <h1>Zer0's Chat</h1>
 
-    <div id="chatArea">
-      <!-- Google Login Section -->
-      <div id="googleLoginSection">
-        <button id="googleLoginButton">Login with Google</button>
-      </div>
-
-      <!-- User Info Section (shown after login) -->
-      <div id="userInfoSection" style="display: none;">
-        <div id="userNameDisplay">Logged in as: <span id="userName"></span></div>
-        <button id="logoutButton">Logout</button>
-      </div>
-
-      <!-- Admin Login Section (if needed) -->
-      <div id="adminLogin" style="display: none;">
-        <div id="adminLoginForm" style="display: block;">
-          <input type="password" id="adminPassword" placeholder="Enter admin password">
-          <button id="adminLoginButton">Login as Admin</button>
-        </div>
-        <div id="adminLoggedIn" style="display: none;">
-          <div class="admin-status">Logged in as Admin</div>
-          <button id="adminLogoutButton">Logout</button>
-        </div>
-      </div>
-
-      <!-- Chat Input and Messages Section -->
-      <div id="messages"></div>
-      <textarea id="messageInput" placeholder="Type a message..." rows="4"></textarea><br>
-      <button id="sendMessageButton">Send Message</button>
+    <!-- Google Login Section -->
+    <div id="googleLoginSection">
+      <button id="googleLoginButton">Login with Google</button>
     </div>
+
+    <!-- User Info Section (shown after login) -->
+    <div id="userInfoSection" style="display: none;">
+      <div>Logged in as: <span id="userName"></span></div>
+      <button id="logoutButton">Logout</button>
+    </div>
+
+    <!-- Chat Messages and Input Section -->
+    <div id="messages"></div>
+    <textarea id="messageInput" placeholder="Type a message..." rows="4"></textarea><br>
+    <button id="sendMessageButton">Send Message</button>
   </div>
 
   <!-- Firebase SDK and Authentication -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-auth.js";
 
+    // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyBNQpxYTyB3I5s_gG_T5uRwA-asPFRVIgc",
-      authDomain: "zer0s-forums.firebaseapp.com",
-      projectId: "zer0s-forums",
-      storageBucket: "zer0s-forums.firebasestorage.app",
-      messagingSenderId: "640478180419",
-      appId: "1:640478180419:web:5962124bf9c278505e50f6"
+     apiKey: "AIzaSyBNQpxYTyB3I5s_gG_T5uRwA-asPFRVIgc",
+  authDomain: "zer0s-forums.firebaseapp.com",
+  databaseURL: "https://zer0s-forums-default-rtdb.firebaseio.com",
+  projectId: "zer0s-forums",
+  storageBucket: "zer0s-forums.firebasestorage.app",
+  messagingSenderId: "640478180419",
+  appId: "1:640478180419:web:5962124bf9c278505e50f6",
+  measurementId: "G-YF8BM2DT4Q"
+
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    const ADMIN_PASSWORD = "10242048";
-    let currentMessages = [];
     let userName = '';
-    let isAdmin = false;
 
     // Fetch Messages from Firestore
     const fetchMessages = async () => {
       const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML = ''; // Clear messages
+      messagesDiv.innerHTML = ''; // Clear previous messages
 
       const messagesRef = collection(db, 'messages');
-      const q = query(messagesRef, orderBy('timestamp'));
+      const q = query(messagesRef, orderBy('timestamp', 'desc'));
       const querySnapshot = await getDocs(q);
 
-      currentMessages = [];
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         const messageData = doc.data();
-        messageData.id = doc.id;
-        currentMessages.push(messageData);
-      });
-      displayMessages(currentMessages);
-    };
-
-    // Display Messages on the Page
-    const displayMessages = (messages) => {
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML = '';
-      messages.forEach(message => {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
-        
-        const messageText = document.createElement('p');
-        messageText.innerText = `${message.sender}: ${message.text}`;
-        messageDiv.appendChild(messageText);
-
-        const timestamp = document.createElement('span');
-        timestamp.classList.add('timestamp');
-        timestamp.innerText = new Date(message.timestamp.toDate()).toLocaleString();
-        messageDiv.appendChild(timestamp);
-
-        if (isAdmin) {
-          const editButton = document.createElement('button');
-          editButton.innerText = "Edit";
-          editButton.onclick = () => editMessage(message.id);
-          messageDiv.appendChild(editButton);
-
-          const deleteButton = document.createElement('button');
-          deleteButton.innerText = "Delete";
-          deleteButton.onclick = () => deleteMessage(message.id);
-          messageDiv.appendChild(deleteButton);
-        }
-
+        messageDiv.innerHTML = `
+          <strong>${messageData.sender}:</strong> ${messageData.text}
+          <span class="timestamp">${new Date(messageData.timestamp.seconds * 1000).toLocaleString()}</span>
+        `;
         messagesDiv.appendChild(messageDiv);
       });
     };
@@ -132,17 +171,17 @@
         await addDoc(collection(db, 'messages'), {
           sender: userName || 'Anonymous',
           text: messageText,
-          timestamp: new Date(),
+          timestamp: Timestamp.now(),
         });
-        messageInput.value = '';
-        fetchMessages();
+        messageInput.value = ''; // Clear input field
+        fetchMessages(); // Refresh messages
       }
     };
 
-    // Google Sign-In
+    // Handle Google Sign-In
     const handleGoogleLogin = () => {
       signInWithPopup(auth, provider)
-        .then(result => {
+        .then((result) => {
           const user = result.user;
           userName = user.displayName || 'Anonymous';
           document.getElementById('userName').textContent = userName;
@@ -150,19 +189,19 @@
           document.getElementById('userInfoSection').style.display = 'block';
           fetchMessages();
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error logging in with Google:", error);
         });
     };
 
-    // Google Logout
+    // Handle Logout
     const handleLogout = () => {
       signOut(auth).then(() => {
         document.getElementById('userInfoSection').style.display = 'none';
         document.getElementById('googleLoginSection').style.display = 'block';
         userName = '';
         document.getElementById('messages').innerHTML = '';
-      }).catch(error => {
+      }).catch((error) => {
         console.error("Error logging out:", error);
       });
     };
@@ -181,54 +220,10 @@
       }
     });
 
-    // Admin Functions
-    const handleAdminLogin = () => {
-      const passwordInput = document.getElementById('adminPassword');
-      const password = passwordInput.value.trim();
-      if (password === ADMIN_PASSWORD) {
-        isAdmin = true;
-        document.getElementById('adminLoginForm').style.display = 'none';
-        document.getElementById('adminLoggedIn').style.display = 'block';
-      } else {
-        alert('Incorrect admin password');
-      }
-    };
-
-    const handleAdminLogout = () => {
-      isAdmin = false;
-      document.getElementById('adminLoginForm').style.display = 'block';
-      document.getElementById('adminLoggedIn').style.display = 'none';
-      fetchMessages();
-    };
-
-    const editMessage = async (messageId) => {
-      if (!isAdmin) return;
-      const newText = prompt('Edit message:');
-      if (newText) {
-        const messageRef = doc(db, 'messages', messageId);
-        await updateDoc(messageRef, { text: newText });
-        fetchMessages();
-      }
-    };
-
-    const deleteMessage = async (messageId) => {
-      if (!isAdmin) return;
-      if (confirm('Are you sure you want to delete this message?')) {
-        const messageRef = doc(db, 'messages', messageId);
-        await deleteDoc(messageRef);
-        fetchMessages();
-      }
-    };
-
+    // Event Listeners
     document.getElementById('sendMessageButton').addEventListener('click', sendMessage);
     document.getElementById('googleLoginButton').addEventListener('click', handleGoogleLogin);
     document.getElementById('logoutButton').addEventListener('click', handleLogout);
-    document.getElementById('adminLoginButton').addEventListener('click', handleAdminLogin);
-    document.getElementById('adminLogoutButton').addEventListener('click', handleAdminLogout);
-
-    // Initial load of messages if already signed in
-    fetchMessages();
   </script>
-
 </body>
 </html>
