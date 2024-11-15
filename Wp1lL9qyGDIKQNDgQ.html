@@ -1,0 +1,1588 @@
+<html><head><base href="/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Negative0's Website</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-auth-compat.js"></script>
+<style>
+    :root {
+        /* Home theme - red (existing) */
+        --primary-red: #ff0000;
+        --dark-red: #800000;
+        --accent: #ff6347;
+
+        /* About theme - purple */
+        --primary-purple: #9b4dca;
+        --dark-purple: #663399;
+        --accent-purple: #b19cd9;
+
+        /* Music theme - blue */
+        --primary-blue: #4169e1;
+        --dark-blue: #00008b;
+        --accent-blue: #87ceeb;
+
+        /* Forums theme - green */
+        --primary-green: #32cd32;
+        --dark-green: #006400;
+        --accent-green: #98fb98;
+
+        /* Fun Stuff theme - orange */
+        --primary-orange: #ff8c00;
+        --dark-orange: #d2691e;
+        --accent-orange: #ffa500;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, var(--primary-red), #000000);
+        background-size: 200% 200%;
+        background-attachment: fixed;
+        color: #eaeaea;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .navbar {
+        backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1em 2em;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        gap: 2em;
+    }
+
+    .navbar a {
+        color: #eaeaea;
+        text-decoration: none;
+        padding: 0.5em 1em;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .navbar a:hover {
+        background: rgba(255, 99, 71, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .navbar a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--accent);
+        transition: all 0.3s ease;
+    }
+
+    .navbar a:hover::after {
+        width: 100%;
+        left: 0;
+    }
+
+    .style-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .styles-dropdown-content {
+        display: none;
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .styles-dropdown-content a {
+        color: #eaeaea;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+    .styles-dropdown-content a:hover {
+        background: rgba(255, 99, 71, 0.2);
+    }
+
+    .welcome-box {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        margin: 1em auto;
+        padding: 1.5em;
+        border-radius: 15px;
+        max-width: 1200px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--accent);
+    }
+
+    .welcome-content {
+        color: #eaeaea;
+        text-align: center;
+    }
+
+    .welcome-content h2 {
+        color: var(--accent);
+        margin-bottom: 0.5em;
+    }
+
+    .welcome-content p {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 1em;
+    }
+
+    .welcome-features {
+        display: flex;
+        justify-content: center;
+        gap: 2em;
+        flex-wrap: wrap;
+    }
+
+    .welcome-features div {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.5em 1em;
+        border-radius: 25px;
+    }
+
+    .welcome-features i {
+        color: var(--accent);
+    }
+
+    .main-content {
+        max-width: 1200px;
+        margin: 2em auto;
+        padding: 2em;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2em;
+        margin: 2em 0;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5em;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-icon {
+        font-size: 2em;
+        color: var(--accent);
+        margin-bottom: 0.5em;
+    }
+
+    .gradient-button {
+        background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .gradient-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+    }
+
+    .footer {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 2em;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 1em;
+        margin: 1em 0;
+    }
+
+    .social-icons a {
+        color: #eaeaea;
+        font-size: 1.5em;
+        transition: color 0.3s ease;
+    }
+
+    .social-icons a:hover {
+        color: var(--accent);
+    }
+
+    .chat-container {
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        border: 1px solid var(--accent);
+        margin: 2em auto;
+        width: 100%;
+        max-width: 800px;
+        padding: 2em;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    #messages {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 1em;
+        margin: 1em 0;
+        max-height: 600px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5em;
+        margin-bottom: 1em;
+        transition: all 0.3s ease;
+        animation: messageSlideIn 0.3s ease-out;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1em;
+        padding-bottom: 0.5em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .timestamp {
+        font-size: 0.8em;
+        color: rgba(255, 255, 255, 0.6);
+        margin-left: 1em;
+    }
+
+    .message-content {
+        margin: 1em 0;
+    }
+
+    .new-post-section {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1em;
+        border-radius: 10px;
+        margin: 1em 0;
+    }
+
+    .reply-section {
+        margin-left: 2em;
+        padding-left: 1em;
+        border-left: 2px solid var(--accent);
+    }
+
+    .reply-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--accent);
+        color: #eaeaea;
+        padding: 0.5em 1em;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9em;
+    }
+
+    .reply-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .reply-input {
+        display: none;
+        margin-top: 1em;
+        width: 100%;
+    }
+
+    .reply-input.active {
+        display: block;
+    }
+
+    @keyframes messageSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #messageInput {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        color: #eaeaea;
+        padding: 1em;
+        margin: 1em 0;
+        resize: vertical;
+    }
+
+    #sendMessageButton {
+        background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        margin: 1em 0;
+    }
+
+    #sendMessageButton:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+    }
+
+    #googleLoginButton {
+        background: linear-gradient(45deg, #4285f4, #34a853);
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        margin: 1em 0;
+    }
+
+    #googleLoginButton:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+    }
+
+    #userInfoSection {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1em;
+        border-radius: 8px;
+        margin: 1em 0;
+    }
+
+    .forum-section {
+        display: none;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: rgba(20, 20, 20, 0.95);
+        margin: 10% auto;
+        padding: 2em;
+        border: 1px solid var(--accent);
+        border-radius: 15px;
+        width: 80%;
+        max-width: 500px;
+        position: relative;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: var(--accent);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .admin-panel {
+        padding: 2em;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2em;
+        padding: 1em;
+    }
+
+    .admin-section {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 1.5em;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1em;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1em;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2em;
+        color: var(--accent);
+        font-weight: bold;
+    }
+
+    .users-list, .messages-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .user-item, .message-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1em;
+        margin: 0.5em 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .admin-controls {
+        display: flex;
+        gap: 0.5em;
+    }
+
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 1em 2em;
+        border-radius: 5px;
+        color: white;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .notification.success {
+        background: rgba(46, 204, 113, 0.9);
+    }
+
+    .notification.error {
+        background: rgba(231, 76, 60, 0.9);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .gradient-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .page {
+        display: none;
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 1200px;
+    }
+
+    .page.active {
+        display: block;
+    }
+
+    .navbar a {
+        cursor: pointer;
+    }
+
+    .game-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2em;
+        margin: 2em 0;
+    }
+
+    .game-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 1.5em;
+        transition: transform 0.3s ease;
+        text-align: center;
+    }
+
+    .game-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .game-preview {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 1em;
+        margin: 1em 0;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .button-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1em;
+        margin: 2em 0;
+    }
+
+    .effect-button {
+        background: linear-gradient(45deg, var(--dark-orange), var(--primary-orange));
+        color: white;
+        border: none;
+        padding: 1em 2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .effect-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+    }
+
+    .effect-button.ripple:hover {
+        background: linear-gradient(45deg, var(--dark-orange), var(--primary-orange));
+    }
+
+    .effect-button.neon:hover {
+        text-shadow: 0 0 10px var(--accent-orange);
+        box-shadow: 0 0 20px var(--accent-orange);
+    }
+
+    .effect-button.bubble:hover {
+        transform: scale(1.05);
+    }
+
+    .effect-button.shake:hover {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .effect-button.bounce:hover {
+        animation: bounce 0.5s ease-in-out;
+    }
+
+    .effect-button.glitch:hover {
+        animation: glitch 0.3s ease-in-out infinite;
+    }
+
+    .effect-button.shadow-pulse:hover {
+        animation: shadowPulse 1s ease-in-out infinite;
+    }
+
+    .effect-button.rainbow:hover {
+        background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+        background-size: 400% 100%;
+        animation: rainbow 3s linear infinite;
+    }
+
+    .tictactoe-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .tictactoe-cell {
+        border: 1px solid var(--accent);
+        transition: background-color 0.3s ease;
+    }
+
+    .tictactoe-cell:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .nav-auth {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 2em;
+    }
+
+    .nav-login-btn {
+        background: linear-gradient(45deg, #4285f4, #34a853);
+        color: white;
+        border: none;
+        padding: 0.5em 1.5em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.9em;
+    }
+
+    .nav-logout-btn {
+        background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+        color: white;
+        border: none;
+        padding: 0.5em 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 1em;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        color: #eaeaea;
+    }
+
+    .user-name {
+        margin-right: 1em;
+        font-weight: 500;
+    }
+
+    .reaction-buttons {
+        display: flex;
+        gap: 0.5em;
+        margin-top: 0.5em;
+    }
+
+    .reaction-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 15px;
+        padding: 0.3em 0.8em;
+        color: #eaeaea;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.3em;
+    }
+
+    .reaction-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+
+    .reaction-count {
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+
+    .message-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1em;
+    }
+</style>
+</head>
+<body class="animated-bg">
+    <div class="navbar">
+        <a href="#" data-page="home"><i class="fas fa-home"></i> Home</a>
+        <a href="#" data-page="about"><i class="fas fa-info-circle"></i> About</a>
+        <a href="#" data-page="music"><i class="fas fa-music"></i> Music</a>
+        <a href="#" data-page="fun-stuff"><i class="fas fa-gamepad"></i> Fun Stuff</a>
+        <div class="nav-auth">
+            <div id="googleLoginSection">
+                <button id="googleLoginButton" class="nav-login-btn">
+                    <i class="fab fa-google"></i> Login
+                </button>
+            </div>
+            <div id="userInfoSection" style="display: none;" class="user-info">
+                <span id="userName" class="user-name"></span>
+                <button id="logoutButton" class="nav-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="style-dropdown">
+            <button class="gradient-button" id="styleBtn1">
+                <i class="fas fa-palette"></i> Styles
+            </button>
+            <div id="styles-menu" class="styles-dropdown-content">
+                <a href="#" onclick="changeStyle('glitch')">Glitch</a>
+                <a href="#" onclick="changeStyle('glitch2')">Glitch 2.0</a>
+                <a href="#" onclick="changeStyle('vaporwave')">Vaporwave</a>
+                <a href="#" onclick="changeStyle('synthwave')">Synthwave</a>
+                <a href="#" onclick="changeStyle('matrix')">Matrix</a>
+                <a href="#" onclick="changeStyle('neon')">Neon</a>
+                <a href="#" onclick="changeStyle('gothic')">Gothic</a>
+                <a href="#" onclick="changeStyle('steampunk')">Steampunk</a>
+                <a href="#" onclick="changeStyle('space')">Space</a>
+                <a href="#" onclick="changeStyle('hacker')">Hacker</a>
+                <a href="#" onclick="changeStyle('holographic')">Holographic</a>
+                <a href="#" onclick="changeStyle('dark')">Dark Default</a>
+            </div>
+        </div>
+        <div class="style-dropdown">
+            <button class="gradient-button" id="styleBtn2">
+                <i class="fas fa-palette"></i> Styles 2
+            </button>
+            <div id="styles-menu-2" class="styles-dropdown-content">
+                <a href="#" onclick="changeStyle('cyber-punk')">Cyber Punk</a>
+                <a href="#" onclick="changeStyle('retro-wave')">Retro Wave</a>
+                <a href="#" onclick="changeStyle('scanner')">Scanner</a>
+                <a href="#" onclick="changeStyle('binary')">Binary Rain</a>
+                <a href="#" onclick="changeStyle('chrome')">Chrome</a>
+                <a href="#" onclick="changeStyle('pixel')">Pixel Art</a>
+                <a href="#" onclick="changeStyle('wireframe')">Wireframe</a>
+                <a href="#" onclick="changeStyle('comic')">Comic Book</a>
+                <a href="#" onclick="changeStyle('sketch')">Hand Drawn</a>
+                <a href="#" onclick="changeStyle('terminal')">Terminal</a>
+                <a href="#" onclick="changeStyle('neon-grid')">Neon Grid</a>
+                <a href="#" onclick="changeStyle('glitch-art')">Glitch Art</a>
+                <a href="#" onclick="changeStyle('static')">Static TV</a>
+                <a href="#" onclick="changeStyle('blueprint')">Blueprint</a>
+                <a href="#" onclick="changeStyle('abstract')">Abstract</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-container">
+        <div id="home" class="page active">
+            <div class="welcome-box">
+                <div class="welcome-content">
+                    <h2><i class="fas fa-hand-wave"></i> Welcome to Our Community!</h2>
+                    <p>This Version is unfinished and needs changes if you somehow found this page you can test it out but if you find bugs post them in the discord </p>
+                    <div class="welcome-features">
+                        <div><i class="fas fa-edit"></i> Create Posts</div>
+                        <div><i class="fas fa-comment"></i> Join Discussions</div>
+                        <div><i class="fas fa-user"></i> Customize Profile</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <h1><i class="fas fa-fire"></i> Welcome to Negative0's Website</h1>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-music feature-icon"></i>
+                        <h3>Music Selection</h3>
+                        <p>Explore our curated playlist and share your favorite tracks with the community.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-users feature-icon"></i>
+                        <h3>Active Forums</h3>
+                        <p>Engage in discussions with like-minded individuals on various topics.</p>
+                    </div>
+                </div>
+
+                <div class="announcements-section">
+                    <h2><i class="fas fa-bullhorn"></i> Important Announcements</h2>
+                    <div id="announcements-container"></div>
+                </div>
+
+                <div class="chat-container">
+                    <h1>Zer0's Forums</h1>
+                    <div class="new-post-section">
+                        <textarea id="messageInput" placeholder="Start a new discussion..." rows="3"></textarea>
+                        <button id="sendMessageButton">
+                            <i class="fas fa-paper-plane"></i> Post Discussion
+                        </button>
+                    </div>
+                    <div id="messages"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="about" class="page">
+            <h1>About</h1>
+            <p>This is a page that exists yeah no idk what to put here. BuT NeGATiVe THen wHy dId yOuin MaKe ThIS AbOuT paGE??? Because i wanted </p>
+        </div>
+
+        <div id="music" class="page">
+            <h1>Music</h1>
+            <p>This is a Work in Progress.</p>
+        </div>
+
+        <div id="fun-stuff" class="page">
+            <div class="welcome-box">
+                <div class="welcome-content">
+                    <h2><i class="fas fa-gamepad"></i> Games & Entertainment</h2>
+                    <p>Welcome to our fun zone! Explore various mini-games and interactive features.</p>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="fun-section minigames">
+                    <h2><i class="fas fa-dice"></i> Games Gallery</h2>
+                    <div class="game-grid">
+                        <div class="game-card">
+                            <h3><i class="fas fa-snake"></i> Snake</h3>
+                            <div class="game-preview">
+                                <canvas id="snake-game" width="300" height="300"></canvas>
+                            </div>
+                            <button class="gradient-button game-button" onclick="startGame('snake')">
+                                Play Snake
+                            </button>
+                        </div>
+                        
+                        <div class="game-card">
+                            <h3><i class="fas fa-times"></i> Tic Tac Toe</h3>
+                            <div class="game-preview">
+                                <div id="tictactoe-board" class="tictactoe-grid"></div>
+                            </div>
+                            <button class="gradient-button game-button" onclick="resetTicTacToe()">
+                                New Game
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fun-section interactive">
+                    <h2><i class="fas fa-magic"></i> Interactive Elements</h2>
+                    <div class="button-gallery">
+                        <button class="effect-button ripple">Ripple Effect</button>
+                        <button class="effect-button neon">Neon Glow</button>
+                        <button class="effect-button bubble">Bubble Pop</button>
+                        <button class="effect-button shake">Shake</button>
+                        <button class="effect-button bounce">Bounce</button>
+                        <button class="effect-button glitch">Glitch</button>
+                        <button class="effect-button shadow-pulse">Shadow Pulse</button>
+                        <button class="effect-button rainbow">Rainbow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-page" class="page">
+            <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+            
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h2><i class="fas fa-bullhorn"></i> Announcements</h2>
+                    <div class="post-form">
+                        <input type="text" id="announcement-title" class="post-input" placeholder="Announcement Title">
+                        <textarea id="announcement-content" class="post-input" rows="4" placeholder="Announcement Content"></textarea>
+                        <button class="gradient-button" onclick="createAnnouncement()">Post Announcement</button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2><i class="fas fa-chart-line"></i> Analytics</h2>
+                    <div class="analytics-grid">
+                        <div class="stat-card">
+                            <div class="stat-title">Active Users</div>
+                            <div id="active-users-count" class="stat-number">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Total Posts</div>
+                            <div id="total-posts-count" class="stat-number">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Total Users</div>
+                            <div id="total-users-count" class="stat-number">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2><i class="fas fa-users-cog"></i> User Management</h2>
+                    <div id="users-list" class="users-list"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h2><i class="fas fa-comments"></i> Message Moderation</h2>
+                    <div id="messages-list" class="messages-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="social-icons">
+            <a href="https://www.youtube.com/channel/UCTWn1tUqbSNLrCLyunHnlcA"><i class="fab fa-youtube"></i></a>
+            <a href="https://steamcommunity.com/id/-Negative0_Debugged0/"><i class="fab fa-steam"></i></a>
+            <a href="https://discord.gg/kQfVYQuJGt"><i class="fab fa-discord"></i></a>
+        </div>
+        <p>© 2024 Negative0's Website. All rights reserved.</p>
+    </footer>
+
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleProfileModal()">&times;</span>
+            <h2>Edit Profile</h2>
+            <div class="profile-form">
+                <div class="profile-picture-section">
+                    <img id="profile-preview" src="" alt="Profile picture" class="profile-picture">
+                    <input type="file" id="profile-picture-input" accept="image/*" onchange="handleProfilePicture(event)" style="display: none;">
+                    <button class="gradient-button" onclick="document.getElementById('profile-picture-input').click()">
+                        <i class="fas fa-camera"></i> Change Picture
+                    </button>
+                </div>
+                <input type="text" id="display-name" class="post-input" placeholder="Display Name">
+                <textarea id="bio" class="post-input" placeholder="Bio" rows="3"></textarea>
+                <button class="gradient-button" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyBNQpxYTyB3I5s_gG_T5uRwA-asPFRVIgc",  
+          authDomain: "zer0s-forums.firebaseapp.com",
+          projectId: "zer0s-forums",
+          storageBucket: "zer0s-forums.firebasestorage.app",
+          messagingSenderId: "640478180419",
+          appId: "1:640478180419:web:5962124bf9c278505e50f6"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Tic Tac Toe Game Logic
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+
+        function createTicTacToeBoard() {
+            const board = document.getElementById('tictactoe-board');
+            board.innerHTML = '';
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            currentPlayer = 'X';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('tictactoe-cell');
+                cell.style.width = '100px';
+                cell.style.height = '100px';
+                cell.style.background = 'rgba(255, 255, 255, 0.1)';
+                cell.style.display = 'flex';
+                cell.style.alignItems = 'center';
+                cell.style.justifyContent = 'center';
+                cell.style.fontSize = '2em';
+                cell.style.cursor = 'pointer';
+                cell.setAttribute('data-cell-index', i);
+                cell.addEventListener('click', () => handleCellClick(i));
+                board.appendChild(cell);
+            }
+        }
+
+        function handleCellClick(index) {
+            if (gameBoard[index] !== '' || !gameActive) return;
+            
+            gameBoard[index] = currentPlayer;
+            document.querySelector(`[data-cell-index="${index}"]`).textContent = currentPlayer;
+            
+            if (checkWin()) {
+                gameActive = false;
+                showNotification(`Player ${currentPlayer} wins!`, 'success');
+                return;
+            }
+            
+            if (gameBoard.every(cell => cell !== '')) {
+                gameActive = false;
+                showNotification("It's a draw!", 'success');
+                return;
+            }
+            
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+
+        function checkWin() {
+            const winConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6] // Diagonals
+            ];
+            
+            return winConditions.some(condition => {
+                return condition.every(index => {
+                    return gameBoard[index] === currentPlayer;
+                });
+            });
+        }
+
+        function resetTicTacToe() {
+            createTicTacToeBoard();
+        }
+
+        // Snake Game Logic
+        let snake = {
+            body: [{x: 10, y: 10}],
+            direction: {x: 0, y: 0},
+            grow: false
+        };
+        let food = {x: 5, y: 5};
+        let gameLoop;
+        const gridSize = 20;
+
+        function startGame(gameType) {
+            if (gameType === 'snake') {
+                const canvas = document.getElementById('snake-game');
+                const ctx = canvas.getContext('2d');
+                
+                // Reset snake state
+                snake = {
+                    body: [{x: 10, y: 10}],
+                    direction: {x: 0, y: 0},
+                    grow: false
+                };
+                
+                // Clear any existing game loop
+                if (gameLoop) clearInterval(gameLoop);
+                
+                // Set up controls
+                document.addEventListener('keydown', handleSnakeControls);
+                
+                // Start game loop
+                gameLoop = setInterval(() => {
+                    updateSnake();
+                    drawSnake(ctx);
+                }, 100);
+            }
+        }
+
+        function handleSnakeControls(event) {
+            switch(event.key) {
+                case 'ArrowUp':
+                    if (snake.direction.y !== 1) {
+                        snake.direction = {x: 0, y: -1};
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (snake.direction.y !== -1) {
+                        snake.direction = {x: 0, y: 1};
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (snake.direction.x !== 1) {
+                        snake.direction = {x: -1, y: 0};
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (snake.direction.x !== -1) {
+                        snake.direction = {x: 1, y: 0};
+                    }
+                    break;
+            }
+        }
+
+        function updateSnake() {
+            const head = {
+                x: snake.body[0].x + snake.direction.x,
+                y: snake.body[0].y + snake.direction.y
+            };
+            
+            // Check for collisions
+            if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+                clearInterval(gameLoop);
+                showNotification('Game Over!', 'error');
+                return;
+            }
+            
+            // Check for self-collision
+            if (snake.body.some(segment => segment.x === head.x && segment.y === head.y)) {
+                clearInterval(gameLoop);
+                showNotification('Game Over!', 'error');
+                return;
+            }
+            
+            snake.body.unshift(head);
+            
+            // Check for food collision
+            if (head.x === food.x && head.y === food.y) {
+                snake.grow = true;
+                food = {
+                    x: Math.floor(Math.random() * gridSize),
+                    y: Math.floor(Math.random() * gridSize)
+                };
+            }
+            
+            if (!snake.grow) {
+                snake.body.pop();
+            } else {
+                snake.grow = false;
+            }
+        }
+
+        function drawSnake(ctx) {
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, 0, 300, 300);
+            
+            // Draw snake
+            const cellSize = 300 / gridSize;
+            ctx.fillStyle = 'var(--accent)';
+            snake.body.forEach(segment => {
+                ctx.fillRect(
+                    segment.x * cellSize,
+                    segment.y * cellSize,
+                    cellSize - 1,
+                    cellSize - 1
+                );
+            });
+            
+            // Draw food
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(
+                food.x * cellSize,
+                food.y * cellSize,
+                cellSize - 1,
+                cellSize - 1
+            );
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setPageTheme('home'); // Set initial theme
+
+            // Initialize the game when the page loads
+            if (document.getElementById('tictactoe-board')) {
+                createTicTacToeBoard();
+            }
+
+            // Page navigation
+            document.querySelectorAll('.navbar a[data-page]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page');
+                    showPage(pageId);
+                });
+            });
+
+            // Style dropdown handlers
+            document.getElementById('styleBtn1').addEventListener('click', () => {
+                document.getElementById('styles-menu').classList.toggle('show');
+            });
+
+            document.getElementById('styleBtn2').addEventListener('click', () => {
+                document.getElementById('styles-menu-2').classList.toggle('show');
+            });
+
+            // Initialize chat if user is already logged in
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                initializeRealtimeChat();
+            }
+
+            // Page switching function
+            function showPage(pageId) {
+                // Hide all pages
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Show selected page
+                const selectedPage = document.getElementById(pageId);
+                if (selectedPage) {
+                    selectedPage.classList.add('active');
+                    setPageTheme(pageId); // Apply the theme
+                }
+            }
+
+            // Show forums page by default
+            showPage('forums');
+
+            const savedStyle = localStorage.getItem('selectedStyle');
+            if (savedStyle) {
+                changeStyle(savedStyle);
+            }
+        });
+
+        function changeStyle(style) {
+            localStorage.setItem('selectedStyle', style);
+            document.body.classList.remove(
+                'glitch', 'glitch2', 'vaporwave', 'synthwave', 'matrix',
+                'neon', 'gothic', 'steampunk', 'space', 'hacker',
+                'holographic', 'dark', 'cyber-punk', 'retro-wave',
+                'scanner', 'binary', 'chrome', 'pixel', 'wireframe',
+                'comic', 'sketch', 'terminal', 'neon-grid', 'glitch-art',
+                'static', 'blueprint', 'abstract'
+            );
+            document.body.classList.add(style);
+            document.getElementById('styles-menu').style.display = 'none';
+            document.getElementById('styles-menu-2').style.display = 'none';
+            showNotification(`Style changed to ${style}`, 'success');
+        }
+
+        function setPageTheme(pageId) {
+            const root = document.documentElement;
+            
+            switch(pageId) {
+                case 'home':
+                    root.style.setProperty('--primary-red', '#ff0000');
+                    root.style.setProperty('--dark-red', '#800000');
+                    root.style.setProperty('--accent', '#ff6347');
+                    document.body.style.background = 'linear-gradient(135deg, var(--primary-red), #000000)';
+                    break;
+                case 'about':
+                    root.style.setProperty('--primary-red', '#9b4dca');
+                    root.style.setProperty('--dark-red', '#663399');
+                    root.style.setProperty('--accent', '#b19cd9');
+                    document.body.style.background = 'linear-gradient(135deg, var(--primary-red), #000000)';
+                    break;
+                case 'music':
+                    root.style.setProperty('--primary-red', '#4169e1');
+                    root.style.setProperty('--dark-red', '#00008b');
+                    root.style.setProperty('--accent', '#87ceeb');
+                    document.body.style.background = 'linear-gradient(135deg, var(--primary-red), #000000)';
+                    break;
+                case 'forums':
+                    root.style.setProperty('--primary-red', '#32cd32');
+                    root.style.setProperty('--dark-red', '#006400');
+                    root.style.setProperty('--accent', '#98fb98');
+                    document.body.style.background = 'linear-gradient(135deg, var(--primary-red), #000000)';
+                    break;
+                case 'fun-stuff':
+                    root.style.setProperty('--primary-red', '#ff8c00');
+                    root.style.setProperty('--dark-red', '#d2691e');
+                    root.style.setProperty('--accent', '#ffa500');
+                    document.body.style.background = 'linear-gradient(135deg, var(--primary-red), #000000)';
+                    break;
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function sendMessage() {
+            try {
+                const messageInput = document.getElementById('messageInput');
+                const messageText = messageInput.value.trim();
+                if (messageText && auth.currentUser) {
+                    db.collection('messages').add({
+                        sender: document.getElementById('userName').textContent || 'Anonymous',
+                        text: messageText,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        userId: auth.currentUser.uid
+                    });
+                    messageInput.value = '';
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+                showNotification('Failed to send message', 'error');
+            }
+        }
+
+        function initializeRealtimeChat() {
+            const messagesDiv = document.getElementById('messages');
+            
+            db.collection('messages')
+                .orderBy('timestamp', 'desc') // Changed to descending order
+                .limit(50)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const messageData = change.doc.data();
+                            const messageDiv = document.createElement('div');
+                            const messageId = change.doc.id;
+                            
+                            // Create message HTML structure (existing structure remains the same)
+                            messageDiv.classList.add('message');
+                            messageDiv.innerHTML = `
+                                <div class="message-header">
+                                    <strong>${messageData.sender}</strong>
+                                    <span class="timestamp">${messageData.timestamp ? new Date(messageData.timestamp.seconds * 1000).toLocaleString() : 'Just now'}</span>
+                                </div>
+                                <div class="message-content">
+                                    ${messageData.text}
+                                </div>
+                                <div class="message-actions">
+                                    <button class="reply-button" onclick="toggleReply('${messageId}')">
+                                        <i class="fas fa-reply"></i> Reply
+                                    </button>
+                                    <div class="reaction-buttons">
+                                        <button onclick="addReaction('${messageId}', '👍')" class="reaction-btn">👍 <span class="reaction-count" id="like-${messageId}">0</span></button>
+                                        <button onclick="addReaction('${messageId}', '❤️')" class="reaction-btn">❤️ <span class="reaction-count" id="heart-${messageId}">0</span></button>
+                                        <button onclick="addReaction('${messageId}', '😄')" class="reaction-btn">😄 <span class="reaction-count" id="smile-${messageId}">0</span></button>
+                                        <button onclick="addReaction('${messageId}', '🎉')" class="reaction-btn">🎉 <span class="reaction-count" id="party-${messageId}">0</span></button>
+                                    </div>
+                                </div>
+                                <div class="reply-input" id="reply-${messageId}">
+                                    <textarea class="post-input" placeholder="Write your reply..." rows="2"></textarea>
+                                    <button class="gradient-button" onclick="submitReply('${messageId}')">Submit Reply</button>
+                                </div>
+                                <div class="reply-section" id="replies-${messageId}"></div>
+                            `;
+                            
+                            // Always insert at the top of the messages container
+                            messagesDiv.insertBefore(messageDiv, messagesDiv.firstChild);
+                            
+                            loadReplies(messageId);
+                            loadReactions(messageId);
+                        }
+                    });
+                });
+        }
+
+        function addReaction(messageId, reaction) {
+            if (!auth.currentUser) {
+                showNotification('Please login to react', 'error');
+                return;
+            }
+            
+            const userId = auth.currentUser.uid;
+            const reactionRef = db.collection('messages').doc(messageId)
+                .collection('reactions').doc(userId);
+            
+            reactionRef.get().then((doc) => {
+                if (doc.exists && doc.data().reaction === reaction) {
+                    // Remove reaction if clicking the same one
+                    reactionRef.delete();
+                } else {
+                    // Add or update reaction
+                    reactionRef.set({
+                        reaction: reaction,
+                        userId: userId,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        function loadReactions(messageId) {
+            const reactionCounts = {
+                '👍': 0, '❤️': 0, '😄': 0, '🎉': 0
+            };
+            
+            db.collection('messages').doc(messageId)
+                .collection('reactions')
+                .onSnapshot((snapshot) => {
+                    // Reset counts
+                    Object.keys(reactionCounts).forEach(key => reactionCounts[key] = 0);
+                    
+                    // Count reactions
+                    snapshot.docs.forEach(doc => {
+                        const reaction = doc.data().reaction;
+                        if (reactionCounts.hasOwnProperty(reaction)) {
+                            reactionCounts[reaction]++;
+                        }
+                    });
+                    
+                    // Update UI
+                    document.getElementById(`like-${messageId}`).textContent = reactionCounts['👍'];
+                    document.getElementById(`heart-${messageId}`).textContent = reactionCounts['❤️'];
+                    document.getElementById(`smile-${messageId}`).textContent = reactionCounts['😄'];
+                    document.getElementById(`party-${messageId}`).textContent = reactionCounts['🎉'];
+                });
+        }
+
+        function toggleReply(messageId) {
+            const replyInput = document.getElementById(`reply-${messageId}`);
+            replyInput.classList.toggle('active');
+        }
+
+        function submitReply(messageId) {
+            if (!auth.currentUser) {
+                showNotification('Please login to reply', 'error');
+                return;
+            }
+            
+            const replyInput = document.querySelector(`#reply-${messageId} textarea`);
+            const replyText = replyInput.value.trim();
+            
+            if (replyText) {
+                db.collection('messages').doc(messageId).collection('replies').add({
+                    sender: document.getElementById('userName').textContent,
+                    text: replyText,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userId: auth.currentUser.uid
+                });
+                
+                replyInput.value = '';
+                toggleReply(messageId);
+            }
+        }
+
+        function loadReplies(messageId) {
+            const repliesDiv = document.getElementById(`replies-${messageId}`);
+            
+            db.collection('messages').doc(messageId).collection('replies')
+                .orderBy('timestamp')
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const replyData = change.doc.data();
+                            const replyDiv = document.createElement('div');
+                            replyDiv.classList.add('message');
+                            
+                            const timestamp = replyData.timestamp ? 
+                                new Date(replyData.timestamp.seconds * 1000).toLocaleString() :
+                                'Just now';
+                            
+                            replyDiv.innerHTML = `
+                                <div class="message-header">
+                                    <strong>${replyData.sender}</strong>
+                                    <span class="timestamp">${timestamp}</span>
+                                </div>
+                                <div class="message-content">
+                                    ${replyData.text}
+                                </div>
+                            `;
+                            
+                            repliesDiv.appendChild(replyDiv);
+                        }
+                    });
+                });
+        }
+
+        document.getElementById('googleLoginButton').addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                document.getElementById('userName').textContent = user.displayName;
+                document.getElementById('userInfoSection').style.display = 'block';
+                document.getElementById('googleLoginSection').style.display = 'none';
+                initializeRealtimeChat(); // Initialize real-time chat
+            } catch (error) {
+                console.error("Login failed:", error);
+            }
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            await auth.signOut();
+            document.getElementById('userInfoSection').style.display = 'none';
+            document.getElementById('googleLoginSection').style.display = 'block';
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('sendMessageButton').addEventListener('click', sendMessage);
+            
+            document.getElementById('messageInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    document.getElementById('userName').textContent = user.displayName;
+                    document.getElementById('userInfoSection').style.display = 'block';
+                    document.getElementById('googleLoginSection').style.display = 'none';
+                    initializeRealtimeChat(); // Initialize real-time chat
+                } else {
+                    document.getElementById('userInfoSection').style.display = 'none';
+                    document.getElementById('googleLoginSection').style.display = 'block';
+                }
+            });
+        });
+
+        function toggleStylesDropdown() {
+            const menu = document.getElementById('styles-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleStylesDropdown2() {
+            const menu = document.getElementById('styles-menu-2');  
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown1 = document.getElementById('styles-menu');
+            const dropdown2 = document.getElementById('styles-menu-2');
+            const button1 = event.target.closest('#styleBtn1');
+            const button2 = event.target.closest('#styleBtn2');
+            
+            if (!button1 && dropdown1) {
+                dropdown1.style.display = 'none';
+            }
+            
+            if (!button2 && dropdown2) {
+                dropdown2.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
