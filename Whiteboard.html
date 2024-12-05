@@ -1,0 +1,1139 @@
+<html><head><base href="." /><base target="_parent" /><meta charset="utf-8"/><title>Interactive Content Creator</title>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        overflow: hidden; /* Prevent body scrolling */
+    }
+    
+    .toolbar {
+        background: #333;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .toolbar button, .toolbar select, .toolbar input {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .toolbar button:hover {
+        background: #ddd;
+    }
+
+    .style-panel {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        display: none;
+        z-index: 1000;
+        max-height: 80vh; /* Limit height to 80% of viewport height */
+        overflow-y: auto; /* Enable vertical scrolling */
+    }
+
+    .style-panel.visible {
+        display: block;
+    }
+
+    .style-panel h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    .style-section {
+        margin-bottom: 15px;
+    }
+
+    .color-presets {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .color-preset {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+
+    .color-preset:hover {
+        transform: scale(1.1);
+    }
+
+    .font-preview {
+        padding: 5px;
+        margin: 2px 0;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .font-preview:hover {
+        background: #f0f0f0;
+    }
+
+    #canvas {
+        background: white;
+        min-height: 2000px;
+        min-width: 2000px;
+        border-radius: 8px;
+        padding: 20px;
+        position: relative;
+        cursor: grab;
+    }
+    
+    #canvas.dragging {
+        cursor: grabbing;
+    }
+
+    .canvas-container {
+        position: absolute;
+        top: 80px; /* Below toolbar */
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: auto;
+    }
+
+    .draggable {
+        position: absolute;
+        cursor: move;
+        padding: 5px;
+        border: 1px dashed transparent;
+        user-select: none;
+        touch-action: none;
+        transition: border-color 0.3s;
+    }
+    
+    .draggable:hover {
+        border: 1px dashed #333;
+    }
+    
+    .draggable.selected {
+        border: 2px solid #007bff;
+        box-shadow: 0 0 8px rgba(0,123,255,0.5);
+        position: absolute;
+    }
+    
+    .draggable.selected .resize-handle {
+        display: block;
+    }
+
+    .resize-handle {
+        display: none;
+        position: absolute;
+        width: 10px; /* Slightly larger handles */
+        height: 10px;
+        background: #007bff;
+        border: 2px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    }
+
+    .resize-handle.nw { top: -4px; left: -4px; cursor: nw-resize; }
+    .resize-handle.ne { top: -4px; right: -4px; cursor: ne-resize; }
+    .resize-handle.sw { bottom: -4px; left: -4px; cursor: sw-resize; }
+    .resize-handle.se { bottom: -4px; right: -4px; cursor: se-resize; }
+    .resize-handle.n { top: -4px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+    .resize-handle.s { bottom: -4px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+    .resize-handle.e { right: -4px; top: 50%; transform: translateY(-50%); cursor: e-resize; }
+    .resize-handle.w { left: -4px; top: 50%; transform: translateY(-50%); cursor: w-resize; }
+
+    .context-menu {
+        position: fixed;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        padding: 5px 0;
+        min-width: 150px;
+        z-index: 1000;
+        display: none;
+    }
+
+    .context-menu.visible {
+        display: block;
+    }
+
+    .context-menu-item {
+        padding: 8px 15px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .context-menu-item:hover {
+        background: #f0f0f0;
+    }
+
+    .context-menu hr {
+        margin: 5px 0;
+        border: none;
+        border-top: 1px solid #eee;
+    }
+
+    .divider {
+        width: 200px;
+        height: 2px;
+        background: #333;
+    }
+
+    .draggable.resizing {
+        cursor: var(--resize-cursor, auto) !important;
+    }
+
+    .draggable.resizing::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px dashed #007bff;
+        pointer-events: none;
+    }
+
+    .gradient-creator {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    .gradient-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    #gradientPreview {
+        height: 40px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+
+    .gradient-presets {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+    }
+
+    .gradient-option {
+        height: 40px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .gradient-option:hover {
+        transform: scale(1.05);
+    }
+
+    /* Add some styling to make scrolling smoother */
+    .style-panel::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .style-panel::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .style-panel::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .style-panel::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    #canvas.drawing {
+        cursor: crosshair !important;
+    }
+
+    .drawing-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .drawing-path {
+        position: absolute;
+        pointer-events: none;
+        touch-action: none;
+        width: 100%;
+        height: 100%;
+    }
+
+    #brushSize, #brushColor {
+        transition: opacity 0.3s;
+    }
+
+    #brushSize.visible, #brushColor.visible {
+        display: inline-block !important;
+    }
+
+    .drawing-path {
+        cursor: crosshair; /* Add style for drawing cursor */
+    }
+
+    .drawing-layer svg {
+        pointer-events: none;
+    }
+
+    #canvas.drawing * {
+        pointer-events: none;
+    }
+
+    #canvas.drawing .drawing-layer {
+        pointer-events: all;
+    }
+    
+    /* Additional style for drawing elements */
+    .drawing-element {
+        pointer-events: auto; /* Enable events for drawing elements */
+        border: 1px dashed rgba(0, 0, 0, 0.5);
+        user-select: none; /* Prevent text selection */
+    }
+</style>
+</head>
+<body>
+    <div class="toolbar">
+        <button onclick="addText()">Add Text</button>
+        <button onclick="toggleStylePanel()">Style Options</button>
+        <button onclick="deleteSelected()">Delete Selected</button>
+        <button onclick="toggleDrawingMode()">Drawing Tool(broken)</button>
+        <select id="brushSize" style="display: none;">
+            <option value="2">Small</option>
+            <option value="5">Medium</option>
+            <option value="10">Large</option>
+        </select>
+        <input type="color" id="brushColor" value="#000000" style="display: none;">
+    </div>
+    
+    <div id="stylePanel" class="style-panel">
+        <h3>Style Options</h3>
+        
+        <div class="style-section">
+            <h4>Colors</h4>
+            <div class="color-presets">
+                <div class="color-preset" style="background: #ff0000" onclick="applyColor('#ff0000')"></div>
+                <div class="color-preset" style="background: #00ff00" onclick="applyColor('#00ff00')"></div>
+                <div class="color-preset" style="background: #0000ff" onclick="applyColor('#0000ff')"></div>
+                <div class="color-preset" style="background: #ffff00" onclick="applyColor('#ffff00')"></div>
+                <div class="color-preset" style="background: #ff00ff" onclick="applyColor('#ff00ff')"></div>
+                <div class="color-preset" style="background: #00ffff" onclick="applyColor('#00ffff')"></div>
+                <div class="color-preset" style="background: #000000" onclick="applyColor('#000000')"></div>
+                <div class="color-preset" style="background: #ffffff" onclick="applyColor('#ffffff')"></div>
+                <div class="color-preset" style="background: #808080" onclick="applyColor('#808080')"></div>
+                <div class="color-preset" style="background: #800000" onclick="applyColor('#800000')"></div>
+            </div>
+            <input type="color" id="colorPicker" onchange="applyColor(this.value)" style="width: 100%">
+            
+            <h4>Gradient Presets</h4>
+            <div class="gradient-option" style="background: linear-gradient(to right, #ff0000, #00ff00)" 
+                 onclick="applyGradient('linear-gradient(to right, #ff0000, #00ff00)')"></div>
+            <div class="gradient-option" style="background: linear-gradient(to right, #0000ff, #ff00ff)"
+                 onclick="applyGradient('linear-gradient(to right, #0000ff, #ff00ff)')"></div>
+            <div class="gradient-option" style="background: linear-gradient(45deg, #ff0000, #ffff00)"
+                 onclick="applyGradient('linear-gradient(45deg, #ff0000, #ffff00)')"></div>
+            <div class="gradient-option" style="background: radial-gradient(circle, #ff0000, #0000ff)"
+                 onclick="applyGradient('radial-gradient(circle, #ff0000, #0000ff)')"></div>
+            <div class="gradient-option" style="background: linear-gradient(135deg, #00ff00, #0000ff, #ff0000)"
+                 onclick="applyGradient('linear-gradient(135deg, #00ff00, #0000ff, #ff0000)')"></div>
+            <div class="gradient-option" style="background: conic-gradient(from 45deg, #ff0000, #00ff00, #0000ff, #ff0000)"
+                 onclick="applyGradient('conic-gradient(from 45deg, #ff0000, #00ff00, #0000ff, #ff0000)')"></div>
+
+            <div class="style-section">
+                <h4>Custom Gradient</h4>
+                <div class="gradient-creator">
+                    <div class="gradient-controls">
+                        <input type="color" id="gradientColor1" value="#ff0000">
+                        <input type="color" id="gradientColor2" value="#0000ff">
+                        <select id="gradientType">
+                            <option value="linear">Linear</option>
+                            <option value="radial">Radial</option>
+                            <option value="conic">Conic</option>
+                        </select>
+                        <input type="number" id="gradientAngle" value="90" min="0" max="360" step="15" 
+                               placeholder="Angle (deg)">
+                    </div>
+                    <div id="gradientPreview"></div>
+                    <button onclick="saveGradientPreset()">Save as Preset</button>
+                </div>
+                <div id="customGradientPresets" class="gradient-presets"></div>
+            </div>
+        </div>
+        
+        <div class="style-section">
+            <h4>Fonts</h4>
+            <div id="fontList">
+                <div class="font-preview" style="font-family: Arial" onclick="applyFont('Arial')">Arial - Sample Text</div>
+                <div class="font-preview" style="font-family: Times New Roman" onclick="applyFont('Times New Roman')">Times New Roman - Sample Text</div>
+                <div class="font-preview" style="font-family: Courier New" onclick="applyFont('Courier New')">Courier New - Sample Text</div>
+                <div class="font-preview" style="font-family: Georgia" onclick="applyFont('Georgia')">Georgia - Sample Text</div>
+                <div class="font-preview" style="font-family: Verdana" onclick="applyFont('Verdana')">Verdana - Sample Text</div>
+                <div class="font-preview" style="font-family: Impact" onclick="applyFont('Impact')">Impact - Sample Text</div>
+                <div class="font-preview" style="font-family: Comic Sans MS" onclick="applyFont('Comic Sans MS')">Comic Sans MS - Sample Text</div>
+            </div>
+        </div>
+        
+        <div class="style-section">
+            <h4>Font Size</h4>
+            <input type="range" id="fontSize" min="8" max="72" value="16" onchange="applyFontSize(this.value)">
+            <span id="fontSizeDisplay">16px</span>
+        </div>
+    </div>
+
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-item" onclick="editElement()">Edit Content</div>
+        <hr>
+        <div class="context-menu-item" onclick="showColorPicker()">Change Color</div>
+        <div class="context-menu-item" onclick="showFontSelector()">Change Font</div>
+        <div class="context-menu-item" onclick="showFontSizeSelector()">Change Size</div>
+        <hr>
+        <div class="context-menu-item" onclick="deleteElement()">Delete</div>
+    </div>
+    
+    <div class="canvas-container">
+        <div id="canvas"></div>
+    </div>
+
+<script>
+const gun = Gun(['https://gun-manhattan.herokuapp.com/gun']);
+const elements = gun.get('canvas-elements');
+
+let selectedElement = null;
+let isDragging = false;
+let isResizing = false;
+let currentHandle = null;
+let originalWidth;
+let originalHeight;
+let originalX;
+let originalY;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+let contextMenuTarget = null;
+
+let isPanning = false;
+let startPoint = { x: 0, y: 0 };
+let scrollLeft = 0;
+let scrollTop = 0;
+
+let isDrawing = false;
+let currentPath = null;
+let drawingMode = false;
+
+let pathPoints = [];
+let drawingUpdateInterval;
+
+elements.map().on(function(data, id) {
+    if (!data) {
+        const existingElement = document.getElementById(id);
+        if (existingElement) {
+            existingElement.remove();
+        }
+        return;
+    }
+    const existingElement = document.getElementById(id);
+    if (!existingElement) {
+        createElementFromData(data, id);
+    } else {
+        updateElementFromData(existingElement, data);
+    }
+});
+
+function createElementFromData(data, id) {
+    const element = document.createElement("div");
+    element.className = "draggable";
+    element.id = id;
+    
+    if (data.type === 'drawing') {
+        element.className += ' drawing-element';
+        element.innerHTML = data.content;
+        const svg = element.querySelector('svg');
+        if (svg) {
+            svg.style.pointerEvents = 'all';
+        }
+    } else if (data.type === 'text') {
+        element.textContent = data.content;
+    }
+    
+    element.style.left = data.left || "20px";
+    element.style.top = data.top || "20px";
+    element.style.color = data.color || "black";
+    element.style.fontFamily = data.fontFamily || "Arial";
+    element.style.fontSize = data.fontSize || "16px";
+    element.style.background = data.background || "transparent";
+    if (data.width) element.style.width = data.width;
+    if (data.height) element.style.height = data.height;
+    
+    element.addEventListener("mousedown", dragStart);
+    element.addEventListener("click", selectElement);
+    element.addEventListener("dblclick", handleDoubleClick);
+    document.getElementById("canvas").appendChild(element);
+}
+
+function addText() {
+    const text = prompt("Enter your text:", "Your text here");
+    if (text) {
+        const id = Date.now().toString();
+        elements.get(id).put({
+            type: 'text',
+            content: text,
+            left: "20px",
+            top: "20px",
+            color: "black",
+            fontFamily: "Arial",
+            fontSize: "16px",
+            background: "transparent"
+        });
+    }
+}
+
+function addDivider() {
+    const id = Date.now().toString();
+    elements.get(id).put({
+        type: 'divider',
+        content: '',
+        left: "20px",
+        top: "20px",
+        background: "#333333",
+        width: '200px',
+        height: '2px'
+    });
+}
+
+function toggleStylePanel() {
+    const panel = document.getElementById('stylePanel');
+    panel.classList.toggle('visible');
+}
+
+function toggleDrawingMode() {
+    drawingMode = !drawingMode;
+    const canvas = document.getElementById('canvas');
+    const brushSize = document.getElementById('brushSize');
+    const brushColor = document.getElementById('brushColor');
+    
+    if (drawingMode) {
+        canvas.classList.add('drawing');
+        brushSize.style.display = 'inline-block';
+        brushColor.style.display = 'inline-block';
+        
+        // Create drawing layer if it doesn't exist
+        if (!document.querySelector('.drawing-layer')) {
+            const drawingLayer = document.createElement('div');
+            drawingLayer.className = 'drawing-layer';
+            canvas.appendChild(drawingLayer);
+        }
+    } else {
+        canvas.classList.remove('drawing');
+        brushSize.style.display = 'none';
+        brushColor.style.display = 'none';
+    }
+}
+
+function applyColor(color) {
+    if (selectedElement) {
+        if (selectedElement.classList.contains('drawing-element')) {
+            const svg = selectedElement.querySelector('svg');
+            if (svg) {
+                svg.querySelectorAll('path, rect, circle, ellipse, line, polygon, polyline').forEach(shape => {
+                    shape.style.stroke = color; // Change the stroke color of the drawing
+                });
+            }
+        } else if (selectedElement.classList.contains('shape')) {
+            if (selectedElement.classList.contains('triangle')) {
+                selectedElement.style.borderBottomColor = color;
+            } else {
+                selectedElement.style.background = color;
+            }
+            elements.get(selectedElement.id).get('background').put(color);
+        } else if (!selectedElement.querySelector('img')) {
+            if (selectedElement.classList.contains('divider')) {
+                selectedElement.style.background = color;
+                elements.get(selectedElement.id).get('background').put(color);
+            } else {
+                selectedElement.style.color = color;
+                elements.get(selectedElement.id).get('color').put(color);
+            }
+        }
+    }
+}
+
+function applyGradient(gradient) {
+    if (selectedElement && !selectedElement.querySelector('img')) {
+        elements.get(selectedElement.id).get('background').put(gradient);
+    }
+}
+
+function applyFont(font) {
+    if (selectedElement && !selectedElement.querySelector('img')) {
+        elements.get(selectedElement.id).get('fontFamily').put(font);
+    }
+}
+
+function applyFontSize(size) {
+    if (selectedElement && !selectedElement.querySelector('img')) {
+        const sizeWithUnit = size + "px";
+        document.getElementById('fontSizeDisplay').textContent = sizeWithUnit;
+        elements.get(selectedElement.id).get('fontSize').put(sizeWithUnit);
+    }
+}
+
+function updateElementFromData(element, data) {
+    if (data.type === 'text') {
+        element.textContent = data.content;
+    } else if (data.type === 'drawing') {
+        element.innerHTML = data.content;
+        const svg = element.querySelector('svg');
+        if (svg) {
+            svg.style.pointerEvents = 'all'; // Enable pointer events on SVG
+        }
+    }
+    element.style.left = data.left;
+    element.style.top = data.top;
+    element.style.color = data.color;
+    element.style.fontFamily = data.fontFamily;
+    element.style.fontSize = data.fontSize;
+    element.style.background = data.background;
+    if (data.width) element.style.width = data.width;
+    if (data.height) element.style.height = data.height;
+}
+
+function handleDoubleClick(e) {
+    const element = e.target.classList.contains("draggable") ? e.target : e.target.parentElement;
+    
+    element.contentEditable = true;
+    element.classList.add('editing');
+    element.focus();
+    
+    function saveChanges() {
+        element.contentEditable = false;
+        element.classList.remove('editing');
+        elements.get(element.id).get('content').put(element.textContent);
+    }
+    
+    element.addEventListener('blur', saveChanges, { once: true });
+    element.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            element.blur();
+        }
+    });
+}
+
+function selectElement(e) {
+    if (!e || !e.target) return;
+    
+    if (selectedElement) {
+        selectedElement.classList.remove('selected');
+        selectedElement.querySelectorAll('.resize-handle').forEach(handle => handle.remove());
+    }
+    
+    const target = e.target.classList.contains("draggable") ? e.target : e.target.closest('.draggable');
+    
+    if (!target) return;
+    
+    selectedElement = target;
+    selectedElement.classList.add('selected');
+    
+    const positions = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+    positions.forEach(pos => {
+        const handle = document.createElement('div');
+        handle.className = `resize-handle ${pos}`;
+        handle.dataset.handle = pos;
+        handle.addEventListener('mousedown', startResize);
+        selectedElement.appendChild(handle);
+    });
+}
+
+function resize(e) {
+    if (!isResizing || !selectedElement) return;
+    
+    e.preventDefault();
+    
+    const rect = selectedElement.getBoundingClientRect();
+    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+    
+    let newWidth = originalWidth;
+    let newHeight = originalHeight;
+    let newX = parseFloat(selectedElement.style.left) || 0;
+    let newY = parseFloat(selectedElement.style.top) || 0;
+    
+    const deltaX = e.clientX - (originalX + canvasRect.left);
+    const deltaY = e.clientY - (originalY + canvasRect.top);
+    
+    const preserveAspect = e.shiftKey || selectedElement.querySelector('img');
+    const aspectRatio = originalWidth / originalHeight;
+    
+    const minWidth = 20;
+    const minHeight = 20;
+    
+    switch(currentHandle) {
+        case 'e':
+            newWidth = Math.max(minWidth, originalWidth + deltaX);
+            if (preserveAspect) newHeight = newWidth / aspectRatio;
+            break;
+        case 'w':
+            newWidth = Math.max(minWidth, originalWidth - deltaX);
+            if (preserveAspect) newHeight = newWidth / aspectRatio;
+            newX = originalX + deltaX;
+            break;
+        case 's':
+            newHeight = Math.max(minHeight, originalHeight + deltaY);
+            if (preserveAspect) newWidth = newHeight * aspectRatio;
+            break;
+        case 'n':
+            newHeight = Math.max(minHeight, originalHeight - deltaY);
+            if (preserveAspect) newWidth = newHeight * aspectRatio;
+            newY = originalY + deltaY;
+            break;
+        case 'se':
+            newWidth = Math.max(minWidth, originalWidth + deltaX);
+            newHeight = Math.max(minHeight, originalHeight + deltaY);
+            if (preserveAspect) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newWidth = newHeight * aspectRatio;
+                }
+            }
+            break;
+        case 'sw':
+            newWidth = Math.max(minWidth, originalWidth - deltaX);
+            newHeight = Math.max(minHeight, originalHeight + deltaY);
+            if (preserveAspect) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newWidth = newHeight * aspectRatio;
+                }
+            }
+            newX = originalX + deltaX;
+            break;
+        case 'ne':
+            newWidth = Math.max(minWidth, originalWidth + deltaX);
+            newHeight = Math.max(minHeight, originalHeight - deltaY);
+            if (preserveAspect) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newWidth = newHeight * aspectRatio;
+                }
+            }
+            newY = originalY + deltaY;
+            break;
+        case 'nw':
+            newWidth = Math.max(minWidth, originalWidth - deltaX);
+            newHeight = Math.max(minHeight, originalHeight - deltaY);
+            if (preserveAspect) {
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    newHeight = newWidth / aspectRatio;
+                } else {
+                    newWidth = newHeight * aspectRatio;
+                }
+            }
+            newX = originalX + deltaX;
+            newY = originalY + deltaY;
+            break;
+    }
+    
+    if (isFinite(newWidth) && isFinite(newHeight) && isFinite(newX) && isFinite(newY)) {
+        selectedElement.style.width = `${newWidth}px`;
+        selectedElement.style.height = `${newHeight}px`;
+        selectedElement.style.left = `${newX}px`;
+        selectedElement.style.top = `${newY}px`;
+        
+        const img = selectedElement.querySelector('img');
+        if (img) {
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+        }
+        
+        clearTimeout(selectedElement.resizeTimeout);
+        selectedElement.resizeTimeout = setTimeout(() => {
+            elements.get(selectedElement.id).put({
+                width: `${newWidth}px`,
+                height: `${newHeight}px`,
+                left: `${newX}px`,
+                top: `${newY}px`
+            });
+        }, 100);
+    }
+}
+
+function stopResize() {
+    if (!isResizing) return;
+    
+    isResizing = false;
+    selectedElement.classList.remove('resizing');
+    selectedElement.style.removeProperty('--resize-cursor');
+    
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+}
+
+function dragStart(e) {
+    if (e.target.classList.contains('resize-handle') || isPanning) return;
+    
+    isDragging = true;
+    const draggable = e.target.classList.contains("draggable") ? e.target : e.target.closest('.draggable');
+    
+    if (!draggable) return;
+    
+    selectedElement = draggable;
+    
+    initialX = e.clientX - xOffset;
+    initialY = e.clientY - yOffset;
+    
+    const rect = draggable.getBoundingClientRect();
+    xOffset = e.clientX - rect.left;
+    yOffset = e.clientY - rect.top;
+    
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+}
+
+function drag(e) {
+    if (!isDragging || !selectedElement) return;
+    
+    e.preventDefault();
+    
+    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+    currentX = e.clientX - canvasRect.left - xOffset;
+    currentY = e.clientY - canvasRect.top - yOffset;
+    
+    selectedElement.style.left = `${currentX}px`;
+    selectedElement.style.top = `${currentY}px`;
+    
+    clearTimeout(selectedElement.dragTimeout);
+    selectedElement.dragTimeout = setTimeout(() => {
+        elements.get(selectedElement.id).put({
+            left: `${currentX}px`,
+            top: `${currentY}px`
+        });
+    }, 100);
+}
+
+function dragEnd(e) {
+    initialX = currentX;
+    initialY = currentY;
+    isDragging = false;
+    
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', dragEnd);
+}
+
+function startResize(e) {
+    if (!selectedElement) return;
+    
+    isResizing = true;
+    currentHandle = e.target.dataset.handle;
+    selectedElement.classList.add('resizing');
+    
+    selectedElement.style.setProperty('--resize-cursor', getComputedStyle(e.target).cursor);
+    
+    const rect = selectedElement.getBoundingClientRect();
+    const canvasRect = document.getElementById('canvas').getBoundingClientRect();
+    
+    originalX = rect.left - canvasRect.left;
+    originalY = rect.top - canvasRect.top;
+    originalWidth = rect.width;
+    originalHeight = rect.height;
+    
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+}
+
+function deleteSelected() {
+    if (selectedElement) {
+        elements.get(selectedElement.id).put(null);
+        selectedElement = null;
+    }
+}
+
+document.addEventListener('contextmenu', function(e) {
+    if (!e.target.classList.contains('draggable') && !e.target.closest('.draggable')) {
+        return;
+    }
+    
+    e.preventDefault();
+    
+    const element = e.target.classList.contains('draggable') ? e.target : e.target.closest('.draggable');
+    selectElement({ target: element });
+    contextMenuTarget = element;
+    
+    const contextMenu = document.getElementById('contextMenu');
+    contextMenu.style.left = `${e.pageX}px`;
+    contextMenu.style.top = `${e.pageY}px`;
+    contextMenu.classList.add('visible');
+});
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.context-menu')) {
+        document.getElementById('contextMenu').classList.remove('visible');
+    }
+});
+
+// Context menu functions
+function editElement() {
+    if (contextMenuTarget) {
+        handleDoubleClick({ target: contextMenuTarget });
+    }
+    document.getElementById('contextMenu').classList.remove('visible');
+}
+
+function showColorPicker() {
+    if (contextMenuTarget) {
+        document.getElementById('stylePanel').classList.add('visible');
+        document.getElementById('colorPicker').click();
+    }
+    document.getElementById('contextMenu').classList.remove('visible');
+}
+
+function showFontSelector() {
+    if (contextMenuTarget) {
+        document.getElementById('stylePanel').classList.add('visible');
+        document.getElementById('fontList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    document.getElementById('contextMenu').classList.remove('visible');
+}
+
+function showFontSizeSelector() {
+    if (contextMenuTarget) {
+        document.getElementById('stylePanel').classList.add('visible');
+        document.getElementById('fontSize').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    document.getElementById('contextMenu').classList.remove('visible');
+}
+
+function deleteElement() {
+    if (contextMenuTarget) {
+        elements.get(contextMenuTarget.id).put(null);
+        contextMenuTarget = null;
+    }
+    document.getElementById('contextMenu').classList.remove('visible');
+}
+
+// Add these functions
+function updateGradientPreview() {
+    const color1 = document.getElementById('gradientColor1').value;
+    const color2 = document.getElementById('gradientColor2').value;
+    const type = document.getElementById('gradientType').value;
+    const angle = document.getElementById('gradientAngle').value;
+    
+    let gradient;
+    switch(type) {
+        case 'linear':
+            gradient = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+            break;
+        case 'radial':
+            gradient = `radial-gradient(circle, ${color1}, ${color2})`;
+            break;
+        case 'conic':
+            gradient = `conic-gradient(from ${angle}deg, ${color1}, ${color2})`;
+            break;
+    }
+    
+    document.getElementById('gradientPreview').style.background = gradient;
+    return gradient;
+}
+
+function saveGradientPreset() {
+    const gradient = updateGradientPreview();
+    const presets = document.getElementById('customGradientPresets');
+    
+    const preset = document.createElement('div');
+    preset.className = 'gradient-option';
+    preset.style.background = gradient;
+    preset.onclick = () => applyGradient(gradient);
+    
+    presets.appendChild(preset);
+    
+    const savedPresets = JSON.parse(localStorage.getItem('gradientPresets') || '[]');
+    savedPresets.push(gradient);
+    localStorage.setItem('gradientPresets', JSON.stringify(savedPresets));
+}
+
+// Add event listeners for gradient controls
+document.getElementById('gradientColor1')?.addEventListener('input', updateGradientPreview);
+document.getElementById('gradientColor2')?.addEventListener('input', updateGradientPreview);
+document.getElementById('gradientType')?.addEventListener('change', updateGradientPreview);
+document.getElementById('gradientAngle')?.addEventListener('input', updateGradientPreview);
+
+// Load saved presets on page load
+function loadSavedGradients() {
+    const savedPresets = JSON.parse(localStorage.getItem('gradientPresets') || '[]');
+    const presetsContainer = document.getElementById('customGradientPresets');
+    
+    savedPresets.forEach(gradient => {
+        const preset = document.createElement('div');
+        preset.className = 'gradient-option';
+        preset.style.background = gradient;
+        preset.onclick = () => applyGradient(gradient);
+        presetsContainer.appendChild(preset);
+    });
+}
+
+// Call this when the page loads
+window.addEventListener('load', loadSavedGradients);
+
+// Add event listeners for canvas panning
+const canvas = document.getElementById('canvas');
+const canvasContainer = document.querySelector('.canvas-container');
+
+canvas.addEventListener('mousedown', function(e) {
+    if (drawingMode && (e.target === canvas || e.target.classList.contains('drawing-layer'))) {
+        isDrawing = true;
+        const drawingLayer = document.querySelector('.drawing-layer');
+        const canvasRect = canvas.getBoundingClientRect();
+        const brushSize = document.getElementById('brushSize').value;
+        const brushColor = document.getElementById('brushColor').value;
+        
+        // Reset points array
+        pathPoints = [];
+        
+        currentPath = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        currentPath.setAttribute('class', 'drawing-path');
+        currentPath.setAttribute('width', '100%');
+        currentPath.setAttribute('height', '100%');
+        currentPath.style.position = 'absolute';
+        currentPath.style.pointerEvents = 'none';
+        
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('stroke', brushColor);
+        path.setAttribute('stroke-width', brushSize);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        
+        const x = e.clientX - canvasRect.left + canvasContainer.scrollLeft;
+        const y = e.clientY - canvasRect.top + canvasContainer.scrollTop;
+        
+        // Add first point
+        pathPoints.push({x, y});
+        path.setAttribute('d', `M ${x} ${y}`);
+        
+        currentPath.appendChild(path);
+        drawingLayer.appendChild(currentPath);
+        
+        // Create unique ID for the path
+        const id = 'drawing-' + Date.now();
+        currentPath.id = id;
+        
+        // Start interval for smoother updates to Gun
+        clearInterval(drawingUpdateInterval);
+        drawingUpdateInterval = setInterval(() => {
+            if (isDrawing && currentPath && pathPoints.length > 0) {
+                elements.get(id).put({
+                    type: 'drawing',
+                    content: currentPath.outerHTML,
+                    left: '0px',
+                    top: '0px'
+                });
+            }
+        }, 100);
+    } else if (!drawingMode && e.target === canvas) {
+        // Handle panning
+        isPanning = true;
+        canvas.classList.add('dragging');
+        startPoint = {
+            x: e.pageX - canvasContainer.offsetLeft,
+            y: e.pageY - canvasContainer.offsetTop
+        };
+        scrollLeft = canvasContainer.scrollLeft;
+        scrollTop = canvasContainer.scrollTop;
+    }
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (isDrawing && currentPath && drawingMode) {
+        e.preventDefault();
+        const path = currentPath.querySelector('path');
+        if (!path) return;
+        
+        const canvasRect = canvas.getBoundingClientRect();
+        const x = e.clientX - canvasRect.left + canvasContainer.scrollLeft;
+        const y = e.clientY - canvasRect.top + canvasContainer.scrollTop;
+        
+        // Add point to array
+        pathPoints.push({x, y});
+        
+        // Optimize path by using last N points
+        const maxPoints = 50;
+        if (pathPoints.length > maxPoints) {
+            pathPoints = pathPoints.slice(-maxPoints);
+        }
+        
+        // Create path data from points
+        const pathData = pathPoints.reduce((acc, point, index) => {
+            if (index === 0) return `M ${point.x} ${point.y}`;
+            return `${acc} L ${point.x} ${point.y}`;
+        }, '');
+        
+        path.setAttribute('d', pathData);
+    } else if (isPanning) {
+        const x = e.pageX - canvasContainer.offsetLeft;
+        const y = e.pageY - canvasContainer.offsetTop;
+        const walkX = (x - startPoint.x);
+        const walkY = (y - startPoint.y);
+        canvasContainer.scrollLeft = scrollLeft - walkX;
+        canvasContainer.scrollTop = scrollTop - walkY;
+    }
+});
+
+// Update the mouseup handler
+document.addEventListener('mouseup', function() {
+    if (isDrawing && currentPath) {
+        const id = currentPath.id;
+        const svg = currentPath.outerHTML;
+        
+        // Create a new draggable element for the drawing
+        elements.get(id).put({
+            type: 'drawing',
+            content: svg,
+            left: `${canvasContainer.scrollLeft}px`,
+            top: `${canvasContainer.scrollTop}px`,
+            width: 'auto',
+            height: 'auto'
+        });
+        
+        clearInterval(drawingUpdateInterval);
+        pathPoints = [];
+    }
+    
+    isDrawing = false;
+    currentPath = null;
+    isPanning = false;
+    canvas.classList.remove('dragging');
+});
+</script>
+</body></html>
