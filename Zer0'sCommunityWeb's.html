@@ -621,6 +621,10 @@ button:hover {
 </div>
 
 <script>
+function addCollaborationStyles() {
+    return;
+}
+
 function updateSitesList(type = 'personal') {
     try {
         const sitesList = document.getElementById('sitesList');
@@ -630,10 +634,8 @@ function updateSitesList(type = 'personal') {
         const gun = Gun(['https://gun-manhattan.herokuapp.com/gun']);
         const sites = gun.get('sites');
 
-        // Listen for real-time updates
         sites.map().on((site, name) => {
             if (!site) {
-                // Site was deleted
                 const existingElement = document.querySelector(`li[data-site-name="${escapeHtml(name)}"]`);
                 if (existingElement) {
                     existingElement.remove();
@@ -641,17 +643,13 @@ function updateSitesList(type = 'personal') {
                 return;
             }
 
-            // Skip old/inactive sites
             if (site.lastModified <= (Date.now() - 1000 * 60 * 60 * 24 * 30)) {
                 return;
             }
 
-            // Filter based on tab type:
-            // Personal tab: show all user's own sites (published and unpublished)
             if (type === 'personal' && site.owner !== firebase.auth().currentUser?.email) {
                 return;
             }
-            // Public tab: show all published sites (including user's own published sites)
             if (type === 'public' && !site.isPublished) {
                 return;
             }
@@ -661,7 +659,6 @@ function updateSitesList(type = 'personal') {
                 sitesList.innerHTML = '';
             }
 
-            // Update or create site element
             const existingElement = document.querySelector(`li[data-site-name="${escapeHtml(name)}"]`);
             const date = new Date(site.lastModified);
             const isPublished = site.isPublished ? 'published' : '';
@@ -686,12 +683,10 @@ function updateSitesList(type = 'personal') {
             `;
 
             if (existingElement) {
-                // Update existing element if content changed
                 if (existingElement.innerHTML !== siteHtml) {
                     existingElement.innerHTML = siteHtml;
                 }
             } else {
-                // Create new element
                 const li = document.createElement('li');
                 li.setAttribute('data-site-name', escapeHtml(name));
                 li.innerHTML = siteHtml;
@@ -699,7 +694,6 @@ function updateSitesList(type = 'personal') {
             }
         });
 
-        // Show empty state if no items after 1 second
         setTimeout(() => {
             if (!hasItems) {
                 sitesList.innerHTML = `
@@ -720,12 +714,29 @@ function updateSitesList(type = 'personal') {
     }
 }
 
-// Add the viewSite function
+function showLogin() {
+    document.getElementById('loginContainer').classList.remove('hidden');
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('editorContainer').classList.add('hidden');
+}
+
+function showDashboard() {
+    document.getElementById('loginContainer').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('editorContainer').classList.add('hidden');
+    updateSitesList('personal');
+}
+
+function showEditor() {
+    document.getElementById('loginContainer').classList.add('hidden');
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('editorContainer').classList.remove('hidden');
+}
+
 window.viewSite = function(name) {
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
     
-    // Get site content
     const gun = Gun(['https://gun-manhattan.herokuapp.com/gun']);
     gun.get('sites').get(name).once((site) => {
         if (site && site.code) {
@@ -782,7 +793,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationCount = document.getElementById('notificationCount');
     let notifications = [];
 
-    // Toggle notifications dropdown
     notificationBell.addEventListener('click', () => {
         notificationsDropdown.classList.toggle('hidden');
         if (!notificationsDropdown.classList.contains('hidden')) {
@@ -790,21 +800,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Close notifications when clicking outside
     document.addEventListener('click', (e) => {
         if (!notificationBell.contains(e.target) && !notificationsDropdown.contains(e.target)) {
             notificationsDropdown.classList.add('hidden');
         }
     });
 
-    // Clear all notifications
     document.getElementById('clearNotifications').addEventListener('click', () => {
         notifications = [];
         updateNotificationsUI();
     });
 
     function addNotification(notification) {
-        // Format message for invite responses
         if (notification.type === 'invite_response') {
             notification.message = `${notification.from} ${notification.response} your invitation to collaborate on ${notification.siteName}`;
         }
@@ -863,7 +870,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return date.toLocaleDateString();
     }
 
-    // Example: Add this to where you handle collaboration invites
     function handleInvite(collaboratorEmail) {
         addNotification({
             message: `${collaboratorEmail} invited you to collaborate on a website`,
@@ -876,14 +882,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!notification) return;
 
         if (accepted) {
-            // Add user as collaborator
             const sites = gun.get('sites');
             sites.get(siteName).get('collaborators').set({
                 email: firebase.auth().currentUser.email,
                 addedAt: Date.now()
             });
 
-            // Create feedback notification for inviter
             gun.get('notifications').get(notification.data.from).set({
                 type: 'invite_response',
                 from: firebase.auth().currentUser.email,
@@ -892,20 +896,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 timestamp: Date.now()
             });
 
-            // Show success message
             addNotification({
                 message: `You are now collaborating on ${siteName}`,
                 type: 'success'
             });
 
-            // Close notifications dropdown
             document.getElementById('notificationsDropdown').classList.add('hidden');
-
-            // Redirect to editor with the site
             editSite(siteName);
             
         } else {
-            // Create decline notification for inviter
             gun.get('notifications').get(notification.data.from).set({
                 type: 'invite_response',
                 from: firebase.auth().currentUser.email,
@@ -915,7 +914,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Remove the invitation notification
         notifications = notifications.filter(n => n.id !== parseInt(notificationId));
         updateNotificationsUI();
     }
@@ -936,7 +934,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             showDashboard();
 
-            // Listen for notifications
             gun.get('notifications').get(user.email).map().on((notification) => {
                 if (notification && !notification.read) {
                     addNotification({
@@ -991,14 +988,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Add collaborator to the site's collaborators list
         sites.get(state.currentEditingSite).get('collaborators').set({
             email: collaboratorEmail,
             addedBy: state.currentUser,
             addedAt: Date.now()
         });
 
-        // Send notification to the collaborator
         gun.get('notifications').get(collaboratorEmail).set({
             type: 'invite',
             from: state.currentUser,
@@ -1006,7 +1001,6 @@ document.addEventListener('DOMContentLoaded', function() {
             timestamp: Date.now()
         });
 
-        // Clear the input
         document.getElementById('collaboratorEmail').value = '';
 
         alert(`Invited ${collaboratorEmail} to collaborate!`);
@@ -1026,21 +1020,18 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Get current user info
         const user = firebase.auth().currentUser;
         if (!user) {
             alert('Please sign in to save your site');
             return;
         }
 
-        // Check if site exists and verify ownership before saving
         sites.get(siteName).once((site) => {
             if (site && site.owner !== user.email) {
                 alert('Only the original creator can save changes to this website');
                 return;
             }
 
-            // Save site data
             sites.get(siteName).put({
                 code: code,
                 owner: user.email,
@@ -1061,13 +1052,11 @@ document.addEventListener('DOMContentLoaded', function() {
         showEditor();
         state.currentEditingSite = name;
         
-        // Load site data
         sites.get(name).once((site) => {
             if (site) {
                 document.getElementById('siteName').value = name;
                 document.getElementById('codeEditor').value = site.code || '';
                 
-                // Show/hide save button based on ownership
                 const saveBtn = document.getElementById('saveBtn');
                 if (site.owner === state.currentUser) {
                     saveBtn.style.display = 'block';
@@ -1075,7 +1064,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveBtn.style.display = 'none';
                 }
                 
-                // Set up real-time syncing for code changes
                 sites.get(name).get('code').on((code) => {
                     if (code && code !== document.getElementById('codeEditor').value) {
                         const currentCursor = document.getElementById('codeEditor').selectionStart;
@@ -1084,14 +1072,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
-                // Add real-time code sync on input
                 document.getElementById('codeEditor').addEventListener('input', (e) => {
                     const newCode = e.target.value;
-                    // Even collaborators can write code in real-time
                     sites.get(name).get('code').put(newCode);
                 });
 
-                // Set up collaborators list
                 sites.get(name).get('collaborators').map().on((collaborator, key) => {
                     if (collaborator) {
                         updateCollaboratorsList(collaborator);
@@ -1104,7 +1089,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateCollaboratorsList(collaborator) {
         const activeCollaborators = document.getElementById('activeCollaborators');
         
-        // Check if collaborator element already exists
         const existingCollaborator = document.querySelector(`[data-collaborator="${collaborator.email}"]`);
         if (!existingCollaborator) {
             const collaboratorEl = document.createElement('div');
@@ -1124,18 +1108,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!state.currentEditingSite) return;
         
         if (confirm(`Remove ${email} from collaborators?`)) {
-            // Get the site's collaborators node
             const collaboratorsNode = sites.get(state.currentEditingSite).get('collaborators');
             
-            // Find and remove the specific collaborator
             collaboratorsNode.map((data, key) => {
                 if (data && data.email === email) {
-                    // Null out this specific collaborator entry
                     collaboratorsNode.get(key).put(null);
                 }
             });
             
-            // Remove from UI
             const collaboratorEl = document.querySelector(`[data-collaborator="${email}"]`);
             if (collaboratorEl) {
                 collaboratorEl.remove();
@@ -1159,7 +1139,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 sites.get(name).get('isPublished').put(newState);
                 sites.get(name).get('lastModified').put(Date.now());
                 
-                // Update UI
                 const publishBtn = document.querySelector(`button[onclick="togglePublish('${name}', ${currentState})"]`);
                 if (publishBtn) {
                     publishBtn.textContent = newState ? 'Unpublish' : 'Publish';
@@ -1167,7 +1146,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     publishBtn.setAttribute('onclick', `togglePublish('${name}', ${newState})`);
                 }
                 
-                // Show feedback
                 const feedback = document.createElement('div');
                 feedback.textContent = `Site ${newState ? 'published' : 'unpublished'} successfully!`;
                 feedback.style.cssText = `
@@ -1197,7 +1175,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Check for collaboration parameter in URL on load
     const urlParams = new URLSearchParams(window.location.search);
     const collabId = urlParams.get('collab');
     if (collabId) {
@@ -1206,7 +1183,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     showLogin();
 
-    // Add event listeners for tabs
     document.getElementById('mySitesTab').addEventListener('click', () => {
         document.getElementById('mySitesTab').classList.add('active');
         document.getElementById('publicSitesTab').classList.remove('active');
@@ -1218,43 +1194,29 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('publicSitesTab').classList.add('active');
         updateSitesList('public');
     });
-});
 
-function showLogin() {
-    document.getElementById('loginContainer').classList.remove('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('editorContainer').classList.add('hidden');
-    document.getElementById('userInfo').classList.add('hidden');
-}
+    document.getElementById('closePreview').addEventListener('click', () => {
+        document.getElementById('previewModal').style.display = 'none';
+    });
 
-function showDashboard() {
-    document.getElementById('loginContainer').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('editorContainer').classList.add('hidden');
-    document.getElementById('mySitesTab').classList.add('active');
-    document.getElementById('publicSitesTab').classList.remove('active');
-    updateSitesList('personal');
-}
-
-function showEditor() {
-    document.getElementById('loginContainer').classList.add('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('editorContainer').classList.remove('hidden');
-}
-
-function addCollaborationStyles() {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-        @keyframes highlightChange {
-            0% { background: rgba(76, 175, 80, 0.2); }
-            100% { background: transparent; }
-        }
+    document.getElementById('fullscreenPreviewBtn').addEventListener('click', function() {
+        const code = document.getElementById('codeEditor').value;
+        const previewModal = document.getElementById('previewModal');
+        const previewFrame = document.getElementById('previewFrame');
         
-        .code-changed {
-            animation: highlightChange 1s ease;
+        previewFrame.srcdoc = code;
+        previewModal.style.display = 'flex';
+        
+        document.getElementById('codeEditor').addEventListener('input', function() {
+            previewFrame.srcdoc = this.value;
+        });
+    });
+
+    document.getElementById('previewModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
         }
-    `;
-    document.head.appendChild(styleElement);
-}
+    });
+});
 </script>
 </body></html>
