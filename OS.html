@@ -1,0 +1,2627 @@
+  <title>Modern Virtual OS</title>
+  <style>
+    :root {
+      --desktop-bg: linear-gradient(135deg, #1a1b1e, #2d2f34);
+      --taskbar-bg: rgba(28, 30, 35, 0.85); 
+      --window-bg: rgba(40, 42, 48, 0.95);
+      --text: #ffffff;
+      --border: rgba(255,255,255,0.1);
+      --accent: #4f8cff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: var(--desktop-bg);
+      background-size: cover !important;
+      background-position: center !important;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text);
+      backdrop-filter: blur(10px);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body[data-theme='dark'] {
+      --desktop-bg: linear-gradient(135deg, #1a1b1e, #2d2f34);
+      --window-bg: rgba(40, 42, 48, 0.95);
+      --taskbar-bg: rgba(28, 30, 35, 0.85);
+      --text: #ffffff;
+    }
+    body[data-theme='light'] {
+      --desktop-bg: linear-gradient(135deg, #ececec, #ffffff);
+      --window-bg: rgba(255, 255, 255, 0.95);
+      --taskbar-bg: rgba(245, 245, 245, 0.85);
+      --text: #000000;
+    }
+
+    #desktop {
+      height: calc(100vh - 45px);
+      position: relative;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 90px);
+      gap: 10px;
+    }
+
+    .icon {
+      width: 90px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 10px;
+      transition: all 0.2s ease;
+      border-radius: 12px;
+      animation: bounce 1s infinite alternate;
+    }
+
+    @keyframes bounce {
+      to {
+        transform: translateY(-5px);
+      }
+    }
+
+    .icon:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .icon svg {
+      width: 45px;
+      height: 45px;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    .icon-text {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      color: var(--text);
+    }
+
+    #taskbar {
+      height: 45px;
+      background: var(--taskbar-bg);
+      backdrop-filter: blur(15px);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      box-shadow: 0 -1px 10px rgba(0,0,0,0.2);
+      transition: background 0.3s ease;
+    }
+
+    .start-button {
+      padding: 8px 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 15px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .start-button:hover {
+      background: var(--accent);
+    }
+
+    button {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--text);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .window {
+      position: absolute;
+      background: var(--window-bg);
+      border-radius: 12px;
+      min-width: 400px;
+      min-height: 300px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: none;
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--border);
+      animation: windowOpen 0.3s ease;
+      transition: transform 0.05s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+      resize: both;
+      overflow: auto;
+    }
+
+    .window-content {
+      height: calc(100% - 45px);
+      overflow: hidden;
+    }
+
+    .window:not(.maximized) .window-content {
+      resize: both;
+      overflow: auto;
+    }
+
+    .window-content textarea,
+    .window-content iframe,
+    .window-content .coder-container,
+    .window-content .preview-frame,
+    .window-content .files-container,
+    .window-content #browser-container,
+    .window-content .code-editor {
+      width: 100% !important;
+      height: 100% !important;
+      overflow: auto;
+    }
+
+    .window#programCoder .coder-container {
+      height: calc(100% - 60px);
+    }
+
+    .editor-section {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .code-editor {
+      flex: 1;
+      min-height: 0; /* Allows flex-grow to work properly */
+    }
+
+    .window#browser .browser-toolbar {
+      min-height: 60px;
+      flex-shrink: 0;
+    }
+
+    .window#browser .window-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #browser-container {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .window#notepad .notepad-toolbar {
+      flex-shrink: 0;
+    }
+
+    .window#notepad textarea {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .window#calculator .window-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .window#explorer .explorer-toolbar {
+      flex-shrink: 0;
+    }
+
+    .window#explorer .files-container {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .window-header {
+      padding: 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      user-select: none;
+    }
+
+    .window-header:active {
+      cursor: grabbing;
+    }
+
+    .window-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 15px;
+    }
+
+    .window-controls span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .window-controls span:nth-child(1) { background: #ffbd4c; }
+    .window-controls span:nth-child(2) { background: #00ca4e; }
+    .window-controls span:nth-child(3) { background: #ff605c; }
+
+    .window-controls span:hover {
+      filter: brightness(1.2);
+    }
+
+    .window-content {
+      padding: 15px;
+    }
+
+    .start-menu {
+      position: fixed;
+      bottom: 50px;
+      left: 15px;
+      width: 350px;
+      background: var(--window-bg);
+      border-radius: 12px;
+      padding: 15px;
+      display: none;
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: menuOpen 0.2s ease;
+    }
+
+    @keyframes menuOpen {
+      from {
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .start-menu-item {
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+      color: var(--text);
+    }
+
+    .start-menu-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .start-menu-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .clock {
+      margin-left: auto;
+      padding: 0 15px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+      color: var(--text);
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      background: rgba(0,0,0,0.2) !important;
+      border-radius: 8px !important;
+      padding: 12px !important;
+      font-size: 14px !important;
+    }
+
+    .explorer-toolbar {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .explorer-sidebar {
+      width: 200px;
+      border-right: 1px solid var(--border);
+      padding: 10px;
+      float: left;
+      height: calc(100% - 100px);
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .files-container {
+      margin-left: 200px;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      height: calc(100% - 100px);
+      overflow-y: auto;
+    }
+
+    .file-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .file-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .file-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 5px;
+    }
+
+    .file-name {
+      font-size: 12px;
+      word-break: break-word;
+      color: var(--text);
+    }
+
+    .settings-sidebar {
+      width: 200px;
+      border-right: 1px solid var(--border);
+      padding: 15px;
+    }
+
+    .settings-nav-item {
+      padding: 12px;
+      margin: 4px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+
+    .settings-nav-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .settings-nav-item.active {
+      background: var(--accent);
+    }
+
+    .settings-main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .settings-section {
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .setting-item {
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .setting-item label {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255,255,255,0.2);
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .setting-description {
+      font-size: 13px;
+      opacity: 0.7;
+      margin: 4px 0;
+      color: var(--text);
+    }
+
+    .notepad-toolbar {
+      padding: 5px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+
+    .context-menu-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .context-menu-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .browser-toolbar {
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      min-height: 60px;
+      flex-shrink: 0;
+    }
+
+    .url-bar {
+      display: flex;
+      flex: 1;
+      gap: 10px;
+    }
+
+    .url-bar input {
+      flex: 1;
+      margin: 0;
+    }
+
+    #browser-container {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .window#browser .window-content {
+      padding: 0;
+      height: calc(100% - 45px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .window#browser .browser-toolbar {
+      min-height: 60px;
+      flex-shrink: 0;
+    }
+
+    .window#browser #browser-container {
+      height: calc(100% - 60px);
+      background: white;
+      border-radius: 0 0 12px 12px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .window#browser #browser-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0 0 12px 12px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .wallpaper-preview {
+      width: 100%;
+      height: 150px;
+      border-radius: 8px;
+      margin: 10px 0;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .wallpaper-preview:hover {
+      transform: scale(1.02);
+      border-color: var(--accent);
+    }
+
+    .wallpaper-preview.active {
+      border-color: var(--accent);
+    }
+    
+    .window#settings {
+      min-width: 400px !important;
+      min-height: 300px !important;
+      max-width: 500px !important;
+      max-height: 500px !important;
+    }
+
+    .window#settings .window-content {
+      height: calc(100% - 45px);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .settings-section {
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    /* Context Menu Styles */
+    #contextMenu {
+      position: fixed;
+      display: none;
+      background: var(--window-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      min-width: 200px;
+    }
+    
+    .docs-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+
+    .docs-section h3 {
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .docs-section pre {
+      font-family: monospace;
+      margin: 10px 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: var(--text);
+    }
+
+    .docs-section ul {
+      margin: 10px 0;
+    }
+
+    .docs-section li {
+      margin: 5px 0;
+      color: var(--text);
+    }
+    
+    .extensions-grid,
+    .extension-card,
+    .extension-title,
+    .extension-description,
+    .extension-toolbar,
+    .extension-editor,
+    .extensions-tabs,
+    .extensions-tab,
+    .installed-extensions,
+    .installed-extension,
+    .installed-extension-title,
+    .installed-extension-actions {
+      display: none !important;
+    }
+    
+    .coder-toolbar {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+
+    .coder-container {
+      display: flex;
+      height: calc(100% - 60px);
+    }
+
+    .editor-section {
+      flex: 1;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .editor-tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .editor-tab.active {
+      background: var(--accent);
+    }
+
+    .code-editor {
+      display: none;
+      height: 100%;
+      background: rgba(0,0,0,0.2) !important;
+      color: var(--text);
+      border: none;
+      outline: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      resize: none;
+    }
+
+    .code-editor.active {
+      display: block;
+    }
+
+    .preview-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-header {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .preview-frame {
+      flex: 1;
+      border: none;
+      background: white;
+    }
+
+    .installer-toolbar {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+    }
+
+    .programs-list {
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .program-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .program-info {
+      color: var(--text);
+    }
+
+    .program-title {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .program-description {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .program-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .publish-modal {
+      background: var(--window-bg);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      width: 400px;
+    }
+
+    .publish-modal textarea {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text);
+      resize: vertical;
+    }
+    
+    .window.maximized .window-content {
+      height: calc(100vh - 90px) !important;  
+      width: 100% !important;
+    }
+
+    .window.maximized .coder-container,
+    .window.maximized #browser-container,
+    .window.maximized .code-editor,
+    .window.maximized .preview-frame,
+    .window.maximized iframe {
+      height: 100% !important;
+      width: 100% !important;
+    }
+
+    .window.maximized textarea {
+      height: calc(100% - 45px) !important;
+      width: 100% !important;
+    }
+    
+    .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: transparent;
+      z-index: 10;
+    }
+
+    .resize-handle.top-left { top: 0; left: 0; cursor: nw-resize; }
+    .resize-handle.top-right { top: 0; right: 0; cursor: ne-resize; }
+    .resize-handle.bottom-left { bottom: 0; left: 0; cursor: sw-resize; }
+    .resize-handle.bottom-right { bottom: 0; right: 0; cursor: se-resize; }
+    
+    /* Add drag styles */
+    .icon-dragging {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+
+    .icon-drop-target {
+      background: rgba(255,255,255,0.2) !important;
+    }
+    
+    /* Add position relative to desktop for absolute positioning */
+    #desktop {
+      position: relative !important;
+    }
+    
+    .icon-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .icon-preview {
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .icon-preview svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .icon-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    #customIconSvg {
+      width: 100%;
+      min-height: 60px;
+      margin-top: 10px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      color: var(--text);
+      font-family: monospace;
+    }
+    
+    .icon-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .icon-options button {
+      padding: 8px;
+      font-size: 12px;
+    }
+    
+    #customImageInput {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="desktop">
+    <div class="icon" onclick="openWindow('notepad')" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3M19,19H5V5H19V19Z"/>
+      </svg>
+      <div class="icon-text">Notepad</div>
+    </div>
+    
+    <div class="icon" onclick="openWindow('calculator')" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M13,7H17V9H13V7M13,11H17V13H13V11M13,15H17V17H13V15M7,7H11V9H7V7M7,11H11V13H7V11M7,15H11V17H7V15Z"/>
+      </svg>
+      <div class="icon-text">Calculator</div>
+    </div>
+    
+    <div class="icon" onclick="openWindow('explorer')" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>
+      </svg>
+      <div class="icon-text">Files</div>
+    </div>
+    <div class="icon" onclick="openWindow('browser')" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M13.75,16L10,12.25L6.25,16H4V6H20V16H13.75Z"/>
+      </svg>
+      <div class="icon-text">Browser</div>
+    </div>
+    <div class="icon" onclick="openWindow('programCoder')" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z"/>
+      </svg>
+      <div class="icon-text">Program Coder</div>
+    </div>
+
+    <div class="icon" onclick="openWindow('programInstaller')" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,0 21,8V18A2,2 0 0,0 19,20M3,13L5,15L7,13L5,11L3,13Z"/>
+      </svg>
+      <div class="icon-text">Program Installer</div>
+    </div>
+    <div class="icon" onclick="openDesktopFolder()" draggable="true">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>
+      </svg>
+      <div class="icon-text">Desktop</div>
+    </div>
+  </div>
+
+  <div id="taskbar">
+    <div class="start-button" onclick="toggleStartMenu()">
+      <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+        <path d="M3,12V6.75L9,5.43V11.91L3,12M19,9H15V3H9V9H5L12,16L19,9M3,13L5,15L7,13L5,11L3,13Z"/>
+      </svg>
+      Start
+    </div>
+    <button id="themeToggle" style="margin-left: 15px;">&#9728;/&#9790;</button>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="start-menu" id="startMenu">
+    <div class="start-menu-item" onclick="openWindow('notepad')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3M19,19H5V5H19V19Z"/>
+      </svg>
+      Notepad
+    </div>
+    <div class="start-menu-item" onclick="openWindow('calculator')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M13,7H17V9H13V7M13,11H17V13H13V11M13,15H17V17H13V15M7,7H11V9H7V7M7,11H11V13H7V11M7,15H11V17H7V15Z"/>
+      </svg>
+      Calculator
+    </div>
+    <div class="start-menu-item" onclick="openWindow('explorer')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>
+      </svg>
+      Files
+    </div>
+    <div class="start-menu-item" onclick="openWindow('settings')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+      </svg>
+      Settings
+    </div>
+    <div class="start-menu-item" onclick="openWindow('browser')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M13.75,16L10,12.25L6.25,16H4V6H20V16H13.75Z"/>
+      </svg>
+      Browser
+    </div>
+    <div class="start-menu-item" onclick="openWindow('programCoder')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z"/>
+      </svg>
+      Program Coder
+    </div>
+    <div class="start-menu-item" onclick="openWindow('programInstaller')">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,0 21,8V18A2,2 0 0,0 19,20M19,8H12L10,6H4V18H19V8M13,17V14H15V17H17V13H19L14,9L9,13H11V17H13Z"/>
+      </svg>
+      Program Installer
+    </div>
+    <div class="start-menu-item" onclick="openDesktopFolder()">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>
+      </svg>
+      Desktop
+    </div>
+    <div class="start-menu-item">
+      <svg viewBox="0 0 24 24" fill="white">
+        <path d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20M3,13L5,15L7,13L5,11L3,13Z"/>
+      </svg>
+      Power
+    </div>
+  </div>
+
+  <div class="window" id="notepad">
+    <div class="window-header">
+      <div class="window-title">Notepad</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('notepad')">_</span>
+        <span onclick="maximizeWindow('notepad')">&#x25a1;</span>
+        <span onclick="closeWindow('notepad')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content">
+      <div class="notepad-toolbar">
+          <button onclick="saveNotepadFile()">Save</button>
+          <button onclick="saveNotepadFileAs()">Save As</button>
+      </div>
+      <textarea id="notepad-content" style="width: 100%; height: calc(100% - 45px); background: var(--window-bg); color: var(--text); border: none; outline: none; resize: none;"></textarea>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="calculator">
+    <div class="window-header">
+      <div class="window-title">Calculator</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('calculator')">_</span>
+        <span onclick="maximizeWindow('calculator')">&#x25a1;</span>
+        <span onclick="closeWindow('calculator')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+        <input type="text" id="calc-display" readonly style="grid-column: span 4; padding: 10px; background: var(--window-bg); color: var(--text); border: 1px solid #666;">
+        <button onclick="clearCalc()">C</button>
+        <button onclick="appendToCalc('7')">7</button>
+        <button onclick="appendToCalc('8')">8</button>
+        <button onclick="appendToCalc('9')">9</button>
+        <button onclick="appendToCalc('+')">+</button>
+        <button onclick="appendToCalc('4')">4</button>
+        <button onclick="appendToCalc('5')">5</button>
+        <button onclick="appendToCalc('6')">6</button>
+        <button onclick="appendToCalc('-')">-</button>
+        <button onclick="appendToCalc('1')">1</button>
+        <button onclick="appendToCalc('2')">2</button>
+        <button onclick="appendToCalc('3')">3</button>
+        <button onclick="appendToCalc('*')">&#xd7;</button>
+        <button onclick="appendToCalc('0')">0</button>
+        <button onclick="appendToCalc('.')">.</button>
+        <button onclick="calculate()">=</button>
+      </div>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="explorer">
+    <div class="window-header">
+      <div class="window-title">Files</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('explorer')">_</span>
+        <span onclick="maximizeWindow('explorer')">&#x25a1;</span>
+        <span onclick="closeWindow('explorer')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content">
+      <div class="explorer-toolbar">
+        <button onclick="navigateFolder('back')">
+          <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+            <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+          </svg>
+        </button>
+        <button onclick="navigateFolder('up')">
+          <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+            <path d="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20M3,13L5,15L7,13L5,11L3,13Z"/>
+          </svg>
+        </button>
+        <input type="text" id="path-input" value="/home/user" style="flex: 1;">
+      </div>
+      <div class="explorer-sidebar">
+        <div class="sidebar-item" onclick="navigateFolder('home')">
+          <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+          </svg>
+          Home
+        </div>
+        <div class="sidebar-item" onclick="navigateFolder('documents')">
+          <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+          </svg>
+          Documents
+        </div>
+        <div class="sidebar-item" onclick="navigateFolder('downloads')">
+          <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+            <path d="M5,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,0 21,8V18A2,2 0 0,0 19,20M3,13L5,15L7,13L5,11L3,13Z"/>
+          </svg>
+          Downloads
+        </div>
+        <div class="sidebar-item" onclick="navigateFolder('desktop')">
+          <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+            <path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>
+          </svg>
+          Desktop
+        </div>
+      </div>
+      <div id="files-container" class="files-container">
+        <!-- Files will be populated by JavaScript -->
+      </div>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="programCoder">
+    <div class="window-header">
+      <div class="window-title">Program Coder</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('programCoder')">_</span>
+        <span onclick="maximizeWindow('programCoder')">&#x25a1;</span>
+        <span onclick="closeWindow('programCoder')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content">
+      <div class="coder-toolbar">
+        <button onclick="newProgram()">New</button>
+        <button onclick="saveProgram()">Save</button>
+        <button onclick="publishProgram()">Publish</button>
+        <button onclick="runProgram()">Run</button>
+      </div>
+      <div class="coder-container">
+        <div class="editor-section" style="flex: 3;">
+          <div class="editor-tabs">
+            <div class="editor-tab active" onclick="switchEditorTab('html')">HTML</div>
+            <div class="editor-tab" onclick="switchEditorTab('css')">CSS</div>
+            <div class="editor-tab" onclick="switchEditorTab('js')">JavaScript</div>
+          </div>
+          <textarea id="htmlEditor" class="code-editor active" style="width: 100%; height: calc(100% - 35px);"></textarea>
+          <textarea id="cssEditor" class="code-editor" style="width: 100%; height: calc(100% - 35px);"></textarea>
+          <textarea id="jsEditor" class="code-editor" style="width: 100%; height: calc(100% - 35px);"></textarea>
+        </div>
+        <div class="preview-section" style="flex: 2;">
+          <div class="preview-header">Live Preview</div>
+          <iframe id="previewFrame" class="preview-frame"></iframe>
+        </div>
+      </div>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="programInstaller">
+    <div class="window-header">
+      <div class="window-title">Program Installer</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('programInstaller')">_</span>
+        <span onclick="maximizeWindow('programInstaller')">&#x25a1;</span>
+        <span onclick="closeWindow('programInstaller')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content">
+      <div class="installer-toolbar">
+        <input type="text" placeholder="Search programs..." id="programSearch" onkeyup="searchPrograms()">
+        <button onclick="refreshPrograms()">Refresh</button>
+      </div>
+      <div class="programs-list" id="programsList"></div>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="settings">
+    <div class="window-header">
+      <div class="window-title">Settings</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('settings')">_</span>
+        <span onclick="maximizeWindow('settings')">&#x25a1;</span>
+        <span onclick="closeWindow('settings')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content" style="padding: 20px;">
+      <div class="settings-section" data-section="wallpaper">
+        <h3>Wallpaper</h3>
+        <div class="setting-description">Choose your desktop background</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+          <div class="wallpaper-preview" style="background: var(--desktop-bg);" onclick="setWallpaper('default')"></div>
+          <div class="wallpaper-preview" style="background: linear-gradient(135deg, #006994, #003366);" onclick="setWallpaper('ocean')"></div>
+          <div class="wallpaper-preview" style="background: linear-gradient(135deg, #ff7e5f, #feb47b);" onclick="setWallpaper('sunset')"></div>
+          <div class="wallpaper-preview" style="background: linear-gradient(135deg, #134e5e, #71b280);" onclick="setWallpaper('forest')"></div>
+          <div class="wallpaper-preview" style="background: linear-gradient(135deg, #5d4157, #a8caba);" onclick="setWallpaper('mountain')"></div>
+          <div class="wallpaper-preview" style="background: linear-gradient(135deg, #093028, #237a57);" onclick="setWallpaper('aurora')"></div>
+        </div>
+      </div>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="browser">
+    <div class="window-header">
+      <div class="window-title">Browser</div>
+      <div class="window-controls">
+        <span onclick="minimizeWindow('browser')">_</span>
+        <span onclick="maximizeWindow('browser')">&#x25a1;</span>
+        <span onclick="closeWindow('browser')">&#xd7;</span>
+      </div>
+    </div>
+    <div class="window-content">
+      <div class="browser-toolbar">
+        <button onclick="browserBack()">
+          <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+            <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+          </svg>
+        </button>
+        <button onclick="browserForward()">
+          <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+            <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"/>
+          </svg>
+        </button>
+        <button onclick="browserRefresh()">
+          <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+            <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+          </svg>
+        </button>
+        <div class="url-bar">
+          <input type="text" id="browser-url" placeholder="Enter URL">
+          <button onclick="loadURL()">Go</button>
+        </div>
+      </div>
+      <div id="browser-container">
+        <iframe id="browser-frame" src style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px;" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" referrerpolicy="no-referrer"></iframe>
+      </div>
+      <div class="resize-handle top-left"></div>
+      <div class="resize-handle top-right"></div>
+      <div class="resize-handle bottom-left"></div>
+      <div class="resize-handle bottom-right"></div>
+    </div>
+  </div>
+
+  <div class="window" id="contextMenu">
+    <div class="context-menu-item" onclick="handleContextMenuAction('newFile')">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="margin-right: 8px;">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+      </svg>
+      New Text File
+    </div>
+    <div class="context-menu-item" onclick="handleContextMenuAction('newFolder')">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="margin-right: 8px;">
+        <path d="M20,6H4C2.89,6 2,5.1 2,4V2c0-1.1 0.89-2 2-2h16c1.1,0 2,0.9 2,2v2c0,1.1-0.89,2-2,2zm-4,12H4V6h16v12z"/>
+      </svg>
+      New Folder
+    </div>
+    <div class="context-menu-item" onclick="handleContextMenuAction('changeWallpaper')">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="margin-right: 8px;">
+        <path d="M19,19H5V5H19M3,13L5,15L7,13L5,11L3,13Z"/>
+      </svg>
+      Change Wallpaper
+    </div>
+    <div class="resize-handle top-left"></div>
+    <div class="resize-handle top-right"></div>
+    <div class="resize-handle bottom-left"></div>
+    <div class="resize-handle bottom-right"></div>
+  </div>
+
+  <div class="window publish-modal" id="publishModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--window-bg); padding: 20px; border-radius: 12px; z-index: 1000;">
+    <h3 style="margin-bottom: 15px; color: var(--text);">Publish Program</h3>
+    <input type="text" id="programName" placeholder="Program name">
+    <textarea id="programDescription" placeholder="Program description" style="width: 100%; min-height: 100px; margin: 10px 0;"></textarea>
+    <div class="setting-item" style="margin-bottom: 15px;">
+      <label style="color: var(--text);">Open Maximized</label>
+      <label class="switch">
+        <input type="checkbox" id="programMaximized">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="setting-item" style="margin-bottom: 15px;">
+      <label style="color: var(--text);">App Icon</label>
+      <div class="icon-selector">
+        <div class="icon-preview">
+          <svg id="selectedIcon" viewBox="0 0 24 24" fill="white">
+            <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L5,8.09V15.91L12,19.85L19,15.91V8.09L12,4.15Z"/>
+          </svg>
+        </div>
+        <div class="icon-options">
+          <button onclick="selectIcon('app')">App</button>
+          <button onclick="selectIcon('code')">Code</button>
+          <button onclick="selectIcon('game')">Game</button>
+          <button onclick="selectIcon('tool')">Tool</button>
+          <button onclick="selectIcon('custom')">Custom SVG</button>
+          <button onclick="selectCustomImage()">Upload Image</button>
+        </div>
+        <textarea id="customIconSvg" placeholder="Paste custom SVG path data here..." style="display:none"></textarea>
+        <input type="file" id="customImageInput" accept="image/*" style="display: none">
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button onclick="cancelPublish()">Cancel</button>
+      <button onclick="confirmPublish()">Publish</button>
+    </div>
+    <div class="resize-handle top-left"></div>
+    <div class="resize-handle top-right"></div>
+    <div class="resize-handle bottom-left"></div>
+    <div class="resize-handle bottom-right"></div>
+  </div>
+
+  <div class="window" id="programContextMenu">
+    <div class="context-menu-item" onclick="pinProgramToDesktop()">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="margin-right: 8px;">
+        <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z"/>
+      </svg>
+      Pin to Desktop
+    </div>
+    <div class="context-menu-item uninstall-option" onclick="uninstallProgramFromMenu()">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="margin-right: 8px;">
+        <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+      </svg>
+      Uninstall
+    </div>
+  </div>
+
+  <div id="notificationContainer" style="position: fixed; bottom: 60px; right: 20px; width: 300px; z-index: 1000;"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js"></script>
+  <script>
+    let activeWindow = null;
+    let startMenuVisible = false;
+    let currentNotepadFile = null;
+    let fileSystem = JSON.parse(localStorage.getItem('fileSystem')) || {
+      '/home/user': [],
+      '/home/user/Documents': [],
+      '/home/user/Downloads': [],
+      '/home/user/Pictures': [],
+      '/home/user/Desktop': [
+        {
+          name: 'Welcome.txt',
+          type: 'file',
+          content: 'A cool website',
+          editable: true
+        }
+      ]
+    };
+    let currentPath = '/home/user';
+    let pathHistory = ['/home/user'];
+    let runningApps = new Set();
+    let minimizedApps = new Set();
+    let windowZIndex = 2;
+    let browserHistory = [];
+    let currentHistoryIndex = -1;
+    const wallpapers = {
+      default: 'linear-gradient(135deg, #1a1b1e, #2d2f34)',
+      ocean: 'linear-gradient(135deg, #006994, #003366)',
+      sunset: 'linear-gradient(135deg, #ff7e5f, #feb47b)',
+      forest: 'linear-gradient(135deg, #134e5e, #71b280)',
+      mountain: 'linear-gradient(135deg, #5d4157, #a8caba)',
+      aurora: 'linear-gradient(135deg, #093028, #237a57)',
+    };
+    
+    const gun = Gun({
+      peers: ['https://gun-manhattan.herokuapp.com/gun']
+    });
+    const programsDB = gun.get('programs');
+    
+    function setWallpaper(wallpaper) {
+      document.body.style.background = wallpapers[wallpaper] || wallpaper;
+      localStorage.setItem('wallpaper', wallpaper);
+    }
+    
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    
+    function toggleStartMenu() {
+      const startMenu = document.getElementById('startMenu');
+      startMenuVisible = !startMenuVisible;
+      startMenu.style.display = startMenuVisible ? 'block' : 'none';
+    }
+    
+    function openWindow(id) {
+      if (!document.getElementById(id)) {
+        return;
+      }
+      const window = document.getElementById(id);
+      window.classList.remove('minimized');
+      window.style.display = 'block';
+      
+      if (id === 'browser' || id === 'programCoder') {
+        window.style.left = '0';
+        window.style.top = '0';
+        window.style.width = '100%';
+        window.style.height = 'calc(100vh - 45px)';
+        window.style.transform = 'none';
+        window.classList.add('maximized');
+        window.setAttribute('data-maximized', 'true');
+        
+        if (id === 'browser') {
+          const urlInput = document.getElementById('browser-url');
+          if (!urlInput.value) {
+            urlInput.value = 'https://example.com';
+            loadURL();
+          }
+        }
+      } else if (id === 'settings') {
+        window.style.width = '450px';
+        window.style.height = '400px';
+        if (!window.style.transform) {
+          window.style.left = '50px';
+          window.style.top = '50px';
+        }
+      } else if (!window.style.transform) {
+        window.style.left = '50px';
+        window.style.top = '50px';
+      }
+      
+      if (activeWindow) {
+        activeWindow.style.zIndex = '1';
+      }
+      window.style.zIndex = windowZIndex++;
+      activeWindow = window;
+      startMenuVisible = false;
+      document.getElementById('startMenu').style.display = 'none';
+      runningApps.add(id);
+      addToTaskbar(id);
+      const taskbarIcon = document.querySelector(`.taskbar-icon[data-app="${id}"]`);
+      if (taskbarIcon) {
+        taskbarIcon.classList.add('active');
+      }
+    }
+    
+    function maximizeWindow(id) {
+      const window = document.getElementById(id);
+      if (window.getAttribute('data-maximized') === 'true') {
+        const prevStateStr = window.getAttribute('data-prev-state');
+        if (prevStateStr) {
+          const prevState = JSON.parse(prevStateStr);
+          window.style.left = prevState.left || '50px';
+          window.style.top = prevState.top || '50px';
+          window.style.width = prevState.width || '800px';
+          window.style.height = prevState.height || '600px';
+          window.style.transform = prevState.transform || 'none';
+          window.classList.remove('maximized');
+          window.removeAttribute('data-maximized');
+        }
+      } else {
+        const prevState = {
+          left: window.style.left || '50px',
+          top: window.style.top || '50px',
+          width: window.style.width || '800px',
+          height: window.style.height || '600px',
+          transform: window.style.transform || 'none'
+        };
+        window.setAttribute('data-prev-state', JSON.stringify(prevState));
+        window.style.left = '0';
+        window.style.top = '0';
+        window.style.width = '100%';
+        window.style.height = 'calc(100vh - 45px)';
+        window.style.transform = 'none';
+        window.classList.add('maximized');
+        window.setAttribute('data-maximized', 'true');
+      }
+      if (activeWindow) {
+        activeWindow.style.zIndex = '1';
+      }
+      window.style.zIndex = windowZIndex++;
+      activeWindow = window;
+    }
+    
+    function closeWindow(id) {
+      if (id === 'notepad') {
+        currentNotepadFile = null;
+      }
+      document.getElementById(id).style.display = 'none';
+      runningApps.delete(id);
+      minimizedApps.delete(id);
+      removeFromTaskbar(id);
+    }
+    
+    function minimizeWindow(id) {
+      const window = document.getElementById(id);
+      window.classList.add('minimized');
+      minimizedApps.add(id);
+      const taskbarIcon = document.querySelector(`.taskbar-icon[data-app="${id}"]`);
+      if (taskbarIcon) {
+        taskbarIcon.classList.remove('active');
+      }
+    }
+    
+    function navigateFolder(path) {
+      switch (path) {
+        case 'back':
+          if (pathHistory.length > 1) {
+            pathHistory.pop();
+            updateFileView(pathHistory[pathHistory.length - 1]);
+          }
+          break;
+        case 'up':
+          const upPath = currentPath.split('/').slice(0, -1).join('/');
+          if (upPath) {
+            pathHistory.push(upPath);
+            updateFileView(upPath);
+          }
+          break;
+        case 'home':
+          pathHistory.push('/home/user');
+          updateFileView('/home/user');
+          break;
+        case 'documents':
+          pathHistory.push('/home/user/Documents');
+          updateFileView('/home/user/Documents');
+          break;
+        case 'downloads':
+          pathHistory.push('/home/user/Downloads');
+          updateFileView('/home/user/Downloads');
+          break;
+        case 'desktop':
+          pathHistory.push('/home/user/Desktop');
+          updateFileView('/home/user/Desktop');
+          break;
+        default:
+          if (fileSystem[path]) {
+            pathHistory.push(path);
+            updateFileView(path);
+          }
+      }
+    }
+    
+    function updateFileView(path) {
+      if (!fileSystem[path]) return;
+      currentPath = path;
+      document.getElementById('path-input').value = path;
+      const container = document.getElementById('files-container');
+      container.innerHTML = '';
+      fileSystem[path].forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.onclick = () => {
+          if (item.type === 'folder') {
+            navigateFolder(`${path}/${item.name}`);
+          }
+        };
+        const icon = document.createElement('svg');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'white');
+        if (item.type === 'folder') {
+          icon.innerHTML = '<path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>';
+        } else {
+          icon.innerHTML = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>';
+        }
+        
+        const name = document.createElement('div');
+        name.className = 'file-name';
+        name.textContent = item.name;
+        div.appendChild(icon);
+        div.appendChild(name);
+        
+        if (item.position) {
+          div.style.position = 'absolute';
+          div.style.left = item.position.x + 'px';
+          div.style.top = item.position.y + 'px';
+        }
+        
+        container.appendChild(div);
+      });
+    }
+    
+    function createFile(path, name, type) {
+      if (!fileSystem[path]) return false;
+      
+      const fileExists = fileSystem[path].some(f => f.name === name);
+      if (fileExists) {
+        alert('A file with this name already exists');
+        return false;
+      }
+
+      const newFile = {
+        name: name,
+        type: type,
+        content: '',
+        editable: true
+      };
+      
+      fileSystem[path].push(newFile);
+      localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+      
+      if (path === '/home/user/Desktop') {
+        updateDesktopIcons();
+      }
+      updateFileView(currentPath);
+      
+      return true;
+    }
+    
+    function deleteFile(path, fileName) {
+      if (!fileSystem[path]) return false;
+      const index = fileSystem[path].findIndex(f => f.name === fileName);
+      if (index === -1) return false;
+      fileSystem[path].splice(index, 1);
+      updateFileView(path);
+      localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+      return true;
+    }
+    
+    function openFile(path, fileName) {
+      const file = fileSystem[path].find(f => f.name === fileName);
+      if (!file) return;
+      if (file.type === 'program-shortcut' && file.program) {
+        openInstalledProgram(file.program);
+      } else if (file.editable) {
+        openWindow('notepad');
+        document.getElementById('notepad-content').value = file.content;
+        currentNotepadFile = fileName;
+      }
+    }
+    
+    function saveNotepadFile() {
+      if (!currentNotepadFile) {
+        saveNotepadFileAs();
+        return;
+      }
+      const content = document.getElementById('notepad-content').value;
+      const file = fileSystem[currentPath].find(f => f.name === currentNotepadFile);
+      if (file) {
+        file.content = content;
+        localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+      }
+    }
+    
+    function saveNotepadFileAs() {
+      const fileName = prompt('Enter file name:', 'new_file.txt');
+      if (!fileName) return;
+      const content = document.getElementById('notepad-content').value;
+      const newFile = {
+        name: fileName,
+        type: 'file',
+        content: content,
+        editable: true
+      };
+      fileSystem[currentPath].push(newFile);
+      currentNotepadFile = fileName;
+      updateFileView(currentPath);
+      localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+    }
+    
+    function clearFileSystem() {
+      localStorage.removeItem('fileSystem');
+      fileSystem = {
+        '/home/user': [],
+        '/home/user/Documents': [],
+        '/home/user/Downloads': [],
+        '/home/user/Pictures': [],
+        '/home/user/Desktop': []
+      };
+      updateFileView(currentPath);
+    }
+    
+    function updateDesktopIcons() {
+      const desktopFiles = fileSystem['/home/user/Desktop'] || [];
+      const desktop = document.getElementById('desktop');
+      const defaultIcons = Array.from(desktop.querySelectorAll('.icon')).slice(0, 7);
+      desktop.innerHTML = '';
+      defaultIcons.forEach(icon => desktop.appendChild(icon));
+      
+      desktopFiles.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'icon';
+        div.onclick = () => {
+          if (item.type === 'file') {
+            openFile('/home/user/Desktop', item.name);
+          } else if (item.type === 'folder') {
+            navigateFolder(`/home/user/Desktop/${item.name}`);
+          } else if (item.type === 'program-shortcut' && item.program) {
+            openInstalledProgram(item.program);
+          }
+        };
+        
+        const icon = document.createElement('svg');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'white');
+        
+        if (item.type === 'folder') {
+          icon.innerHTML = '<path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/>';
+        } else if (item.type === 'program-shortcut' && item.program) {
+          icon.innerHTML = `<path d="${item.program.iconPath || 'M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L5,8.09V15.91L12,19.85L19,15.91V8.09L12,4.15Z'}"/>`;
+        } else {
+          icon.innerHTML = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>';
+        }
+        
+        const name = document.createElement('div');
+        name.className = 'icon-text';
+        name.textContent = item.name;
+        div.appendChild(icon);
+        div.appendChild(name);
+        
+        if (item.position) {
+          div.style.position = 'absolute';
+          div.style.left = item.position.x + 'px';
+          div.style.top = item.position.y + 'px';
+        }
+        
+        desktop.appendChild(div);
+      });
+    }
+    
+    function addToTaskbar(id) {
+      if (!document.querySelector(`.taskbar-icon[data-app="${id}"]`)) {
+        const icon = document.createElement('div');
+        icon.className = 'taskbar-icon running';
+        icon.setAttribute('data-app', id);
+        icon.innerHTML = getAppIcon(id);
+        icon.onclick = () => toggleWindow(id);
+        document.getElementById('taskbar').insertBefore(icon, document.querySelector('.clock'));
+      }
+    }
+    
+    function removeFromTaskbar(id) {
+      const icon = document.querySelector(`.taskbar-icon[data-app="${id}"]`);
+      if (icon) {
+        icon.remove();
+      }
+    }
+    
+    function getAppIcon(id) {
+      const icons = {
+        notepad: '<svg viewBox="0 0 24 24" fill="white"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3M19,19H5V5H19V19Z"/></svg>',
+        calculator: '<svg viewBox="0 0 24 24" fill="white"><path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M13,7H17V9H13V7M13,11H17V13H13V11M13,15H17V17H13V15M7,7H11V9H7V7M7,11H11V13H7V11M7,15H11V17H7V15Z"/></svg>',
+        explorer: '<svg viewBox="0 0 24 24" fill="white"><path d="M4 5v14h16V5H4zm14 12H6V7h12v10z"/></svg>',
+        settings: '<svg viewBox="0 0 24 24" fill="white"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>',
+        browser: '<svg viewBox="0 0 24 24" fill="white"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M13.75,16L10,12.25L6.25,16H4V6H20V16H13.75Z"/></svg>',
+        programCoder: '<svg viewBox="0 0 24 24" fill="white"><path d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,18L8,18L9.4,16.6Z"/></svg>',
+      programInstaller: '<svg viewBox="0 0 24 24" fill="white"><path d="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,0 21,8V18A2,2 0 0,0 19,20M3,13L5,15L7,13L5,11L3,13Z"/></svg>',
+    };
+    return icons[id] || '';
+  }
+  
+  function loadURL() {
+    const urlInput = document.getElementById('browser-url');
+    const container = document.getElementById('browser-container');
+    let url = urlInput.value;
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+      urlInput.value = url;
+    }
+    container.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
+    iframe.setAttribute('referrerpolicy', 'no-referrer');
+    if (currentHistoryIndex < browserHistory.length - 1) {
+      browserHistory = browserHistory.slice(0, currentHistoryIndex + 1);
+    }
+    browserHistory.push(url);
+    currentHistoryIndex = browserHistory.length - 1;
+    iframe.src = url;
+    container.appendChild(iframe);
+  }
+  
+  function browserBack() {
+    if (currentHistoryIndex > 0) {
+      currentHistoryIndex--;
+      document.getElementById('browser-url').value = browserHistory[currentHistoryIndex];
+      loadURL();
+    }
+  }
+  
+  function browserForward() {
+    if (currentHistoryIndex < browserHistory.length - 1) {
+      currentHistoryIndex++;
+      document.getElementById('browser-url').value = browserHistory[currentHistoryIndex];
+      loadURL();
+    }
+  }
+  
+  function browserRefresh() {
+    loadURL();
+  }
+  
+  function showContextMenu(e) {
+    e.preventDefault();
+    const contextMenu = document.getElementById('contextMenu');
+    const isDesktop = e.target.closest('#desktop');
+    const isFilesWindow = e.target.closest('#explorer') || e.target.closest('#files-container');
+    
+    if (isDesktop || isFilesWindow) {
+      const currentLocation = isDesktop ? '/home/user/Desktop' : currentPath;
+      contextMenu.setAttribute('data-target', currentLocation);
+      contextMenu.style.display = 'block';
+      
+      const x = Math.min(e.clientX, window.innerWidth - contextMenu.offsetWidth);
+      const y = Math.min(e.clientY, window.innerHeight - contextMenu.offsetHeight);
+      contextMenu.style.left = x + 'px';
+      contextMenu.style.top = y + 'px';
+    }
+  }
+  
+  function handleContextMenuAction(action) {
+    const contextMenu = document.getElementById('contextMenu');
+    const targetPath = contextMenu.getAttribute('data-target');
+    contextMenu.style.display = 'none';
+    
+    switch (action) {
+      case 'newFile':
+        const fileName = prompt('Enter file name:', 'New File.txt');
+        if (fileName) {
+          createFile(targetPath, fileName, 'file');
+        }
+        break;
+      case 'newFolder':
+        const folderName = prompt('Enter folder name:', 'New Folder');
+        if (folderName) {
+          createFile(targetPath, folderName, 'folder');
+          fileSystem[`${targetPath}/${folderName}`] = [];
+          localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+        }
+        break;
+      case 'changeWallpaper':
+        openWindow('settings');
+        break;
+      default:
+        break;
+    }
+  }
+  
+  function toggleWindow(id) {
+    const window = document.getElementById(id);
+    if (window.classList.contains('minimized')) {
+      window.classList.remove('minimized');
+      minimizedApps.delete(id);
+      window.style.display = 'block';
+    } else {
+      window.classList.add('minimized');
+      minimizedApps.add(id);
+      window.style.display = 'none';
+    }
+    const taskbarIcon = document.querySelector(`.taskbar-icon[data-app="${id}"]`);
+    if (taskbarIcon) {
+      taskbarIcon.classList.toggle('active');
+    }
+  }
+  
+  function openDesktopFolder() {
+    pathHistory.push('/home/user/Desktop');
+    updateFileView('/home/user/Desktop');
+    openWindow('explorer');
+  }
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedWallpaper = localStorage.getItem('wallpaper');
+    if (savedWallpaper) {
+      setWallpaper(savedWallpaper);
+    }
+    updateDesktopIcons();
+    updateStartMenu();
+    
+    document.getElementById('desktop').querySelectorAll('.icon').forEach(icon => {
+      icon.addEventListener('dragstart', handleDragStart);
+      icon.addEventListener('dragend', handleDragEnd);
+      icon.addEventListener('dragover', handleDragOver); 
+      icon.addEventListener('drop', handleDrop);
+    });
+
+    document.getElementById('files-container').addEventListener('contextmenu', showContextMenu);
+    document.getElementById('explorer').addEventListener('contextmenu', showContextMenu);
+  });
+  
+  function handleDragStart(e) {
+    const icon = e.target.closest('.icon');
+    if (icon) {
+      icon.classList.add('icon-dragging');
+      
+      const rect = icon.getBoundingClientRect();
+      const startX = rect.left;
+      const startY = rect.top;
+      
+      const iconOffsetX = e.clientX - startX;
+      const iconOffsetY = e.clientY - startY;
+      
+      const dragImage = icon.cloneNode(true);
+      dragImage.style.opacity = '0.5';
+      document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, iconOffsetX, iconOffsetY);
+      setTimeout(() => document.body.removeChild(dragImage), 0);
+    }
+  }
+
+  function handleDragEnd(e) {
+    const icon = e.target.closest('.icon');
+    if (icon) {
+      icon.classList.remove('icon-dragging');
+      document.querySelectorAll('.icon-drop-target').forEach(el => el.classList.remove('icon-drop-target'));
+      
+      if (e.clientX > 0 && e.clientY > 0) {
+        const desktop = document.getElementById('desktop');
+        const rect = desktop.getBoundingClientRect();
+        
+        const newX = e.clientX - rect.left;
+        const newY = e.clientY - rect.top;
+        
+        const maxX = rect.width - icon.offsetWidth;
+        const maxY = rect.height - icon.offsetHeight;
+        
+        const boundedX = Math.min(Math.max(0, newX), maxX);
+        const boundedY = Math.min(Math.max(0, newY), maxY);
+        
+        icon.style.position = 'absolute';
+        icon.style.left = boundedX + 'px';
+        icon.style.top = boundedY + 'px';
+        
+        const fileName = icon.querySelector('.icon-text').textContent;
+        const file = fileSystem['/home/user/Desktop'].find(f => f.name === fileName);
+        if (file) {
+          file.position = {x: boundedX, y: boundedY};
+          localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+        }
+      }
+    }
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    const icon = e.target.closest('.icon');
+    if (icon) {
+      icon.classList.add('icon-drop-target');
+    }
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    const icon = e.target.closest('.icon');
+    if (icon) {
+      icon.classList.remove('icon-drop-target');
+      
+      const rect = document.getElementById('desktop').getBoundingClientRect();
+      const temp = {
+        left: icon.style.left,
+        top: icon.style.top
+      };
+      
+      icon.style.left = e.clientX - rect.left + 'px';
+      icon.style.top = e.clientY - rect.top + 'px';
+      
+      const draggedName = icon.querySelector('.icon-text').textContent;
+      const draggedFile = fileSystem['/home/user/Desktop'].find(f => f.name === draggedName);
+      
+      if (draggedFile) {
+        draggedFile.position = {x: e.clientX - rect.left, y: e.clientY - rect.top};
+        localStorage.setItem('fileSystem', JSON.stringify(fileSystem));
+      }
+    }
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.start-button') && !e.target.closest('.start-menu')) {
+      startMenuVisible = false;
+      document.getElementById('startMenu').style.display = 'none';
+    }
+    if (!e.target.closest('#contextMenu')) {
+      document.getElementById('contextMenu').style.display = 'none';
+    }
+    if (!e.target.closest('#programContextMenu')) {
+      document.getElementById('programContextMenu').style.display = 'none';
+    }
+    if (e.target.closest('.file-item')) {
+      const fileName = e.target.closest('.file-item').querySelector('.file-name').textContent;
+      const file = fileSystem[currentPath].find(f => f.name === fileName);
+      if (file && file.type === 'file') {
+        openFile(currentPath, fileName);
+      }
+    }
+  });
+  
+  let installedPrograms = JSON.parse(localStorage.getItem('installedPrograms')) || [];
+  let publishedPrograms = JSON.parse(localStorage.getItem('publishedPrograms')) || [];
+  let currentProgram = {
+    html: '',
+    css: '',
+    js: ''
+  };
+
+  const iconPaths = {
+    app: 'M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L5,8.09V15.91L12,19.85L19,15.91V8.09L12,4.15Z',
+  code: 'M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z',
+  game: 'M21,6H3A2,2 0 0,0 1,8V16A2,2 0 0,0 3,18H21A2,2 0 0,0 23,16V8A2,2 0 0,0 21,6M11,13H8V16H6V13H3V11H6V8H8V11H11M15.5,15A1.5,1.5 0 0,1 14,13.5A1.5,1.5 0 0,1 15.5,12A1.5,1.5 0 0,1 17,13.5A1.5,1.5 0 0,1 15.5,15M19.5,12A1.5,1.5 0 0,1 18,10.5A1.5,1.5 0 0,1 19.5,9A1.5,1.5 0 0,1 21,10.5A1.5,1.5 0 0,1 19.5,12Z',
+  tool: 'M22.7,19L13.6,9.9C14.5,7.6 14,4.9 12.1,3C10.1,1 7.1,0.8 4.7,2.4L9,6.7L6.7,9L2.4,4.7C0.8,7.1 1,10.1 3,12.1C4.9,14 7.6,14.5 9.9,13.6L19,22.7C19.4,23.1 20,23.1 20.4,22.7L22.7,20.4C23.1,20 23.1,19.4 22.7,19Z'
+  };
+
+  let currentIconPath = iconPaths.app;
+
+  function selectIcon(type) {
+    const customField = document.getElementById('customIconSvg');
+    if (type === 'custom') {
+      customField.style.display = 'block';
+      customField.oninput = (e) => {
+        currentIconPath = e.target.value;
+        document.getElementById('selectedIcon').innerHTML = `<path d="${currentIconPath}"/>`;
+      };
+    } else {
+      customField.style.display = 'none';
+      currentIconPath = iconPaths[type];
+      document.getElementById('selectedIcon').innerHTML = `<path d="${currentIconPath}"/>`;
+    }
+  }
+
+  function switchEditorTab(tab) {
+    document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.code-editor').forEach(e => e.classList.remove('active'));
+    document.querySelector(`.editor-tab:nth-child(${tab === 'html' ? 1 : tab === 'css' ? 2 : 3})`).classList.add('active');
+    document.getElementById(`${tab}Editor`).classList.add('active');
+  }
+
+  function updatePreview() {
+    const preview = document.getElementById('previewFrame');
+    const html = document.getElementById('htmlEditor').value;
+    const css = document.getElementById('cssEditor').value;
+    const js = document.getElementById('jsEditor').value;
+    
+    const content = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>${css}</style>
+        </head>
+        <body>
+          ${html}
+          <script>${js}<\/script>
+        </body>
+      </html>
+    `;
+    
+    preview.srcdoc = content;
+  }
+
+  function newProgram() {
+    currentProgram = {
+      html: '',
+      css: '',
+      js: ''
+    };
+    document.getElementById('htmlEditor').value = '';
+    document.getElementById('cssEditor').value = '';
+    document.getElementById('jsEditor').value = '';
+    updatePreview();
+  }
+
+  function saveProgram() {
+    currentProgram = {
+      html: document.getElementById('htmlEditor').value,
+      css: document.getElementById('cssEditor').value,
+      js: document.getElementById('jsEditor').value
+    };
+  }
+
+  function publishProgram() {
+    document.getElementById('publishModal').style.display = 'block';
+  }
+
+  function cancelPublish() {
+    document.getElementById('publishModal').style.display = 'none';
+  }
+
+  function confirmPublish() {
+    const name = document.getElementById('programName').value;
+    const description = document.getElementById('programDescription').value;
+    const maximized = document.getElementById('programMaximized').checked;
+    
+    if (!name || !description) {
+      alert('Please fill in all fields');
+      return;
+    }
+    
+    const program = {
+      id: Date.now(),
+      name,
+      description,
+      html: document.getElementById('htmlEditor').value,
+      css: document.getElementById('cssEditor').value,
+      js: document.getElementById('jsEditor').value,
+      maximized,
+      iconPath: currentIconPath,
+      timestamp: Date.now()
+    };
+    
+    programsDB.get(program.id).put(program);
+    document.getElementById('publishModal').style.display = 'none';
+    document.getElementById('programName').value = '';
+    document.getElementById('programDescription').value = '';
+    document.getElementById('programMaximized').checked = false;
+    alert('Program published successfully!');
+    showNotification('Program published successfully!', 3000);
+  }
+
+  function runProgram() {
+    updatePreview();
+  }
+
+  function refreshPrograms() {
+    const container = document.getElementById('programsList');
+    container.innerHTML = '';
+    
+    programsDB.map().once((program, id) => {
+      if (!program) return;
+      
+      const isInstalled = installedPrograms.some(p => p.id === program.id);
+      const card = document.createElement('div');
+      card.className = 'program-card';
+      card.innerHTML = `
+        <div class="program-info">
+          <svg viewBox="0 0 24 24" fill="white" width="24" height="24" style="margin-right: 8px;">
+            <path d="${program.iconPath || iconPaths.app}"/>
+          </svg>
+          <div>
+            <div class="program-title">${program.name}</div>
+            <div class="program-description">${program.description}</div>
+          </div>
+        </div>
+        <div class="program-actions">
+          <button onclick="${isInstalled ? 'uninstallProgram' : 'installProgram'}('${id}')">
+            ${isInstalled ? 'Uninstall' : 'Install'}
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function installProgram(id) {
+    programsDB.get(id).once((program) => {
+      if (!program) return;
+      
+      installedPrograms.push(program);
+      localStorage.setItem('installedPrograms', JSON.stringify(installedPrograms));
+      refreshPrograms();
+      updateStartMenu();
+    });
+  }
+
+  function uninstallProgram(id) {
+    installedPrograms = installedPrograms.filter(p => p.id !== id);
+    localStorage.setItem('installedPrograms', JSON.stringify(installedPrograms));
+    refreshPrograms();
+    updateStartMenu();
+    
+    const windowId = `program-${id}`;
+    if (document.getElementById(windowId)) {
+      closeWindow(windowId);
+    }
+  }
+
+  function searchPrograms() {
+    const query = document.getElementById('programSearch').value.toLowerCase();
+    const container = document.getElementById('programsList');
+    container.innerHTML = '';
+    
+    programsDB.map().once((program, id) => {
+      if (!program) return;
+      
+      if (program.name.toLowerCase().includes(query) || 
+          program.description.toLowerCase().includes(query)) {
+        const isInstalled = installedPrograms.some(p => p.id === program.id);
+        const card = document.createElement('div');
+        card.className = 'program-card';
+        card.innerHTML = `
+          <div class="program-info">
+            <div class="program-title">${program.name}</div>
+            <div class="program-description">${program.description}</div>
+          </div>
+          <div class="program-actions">
+            <button onclick="${isInstalled ? 'uninstallProgram' : 'installProgram'}('${id}')">
+              ${isInstalled ? 'Uninstall' : 'Install'}
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    });
+  }
+
+  function openInstalledProgram(program) {
+    const windowId = `program-${program.id}`;
+    
+    if (!document.getElementById(windowId)) {
+      const programWindow = document.createElement('div');
+      programWindow.className = 'window';
+      programWindow.id = windowId;
+      programWindow.innerHTML = `
+        <div class="window-header">
+          <div class="window-title">
+            <svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="margin-right: 8px;">
+              <path d="${program.iconPath || iconPaths.app}"/>
+            </svg>
+            ${program.name}
+          </div>
+          <div class="window-controls">
+            <span onclick="minimizeWindow('${windowId}')">_</span>
+            <span onclick="maximizeWindow('${windowId}')">&#x25a1;</span>
+            <span onclick="closeWindow('${windowId}')">&#xd7;</span>
+          </div>
+        </div>
+        <div class="window-content">
+          <iframe id="frame-${windowId}" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+      `;
+      document.body.appendChild(programWindow);
+      
+      const iframe = document.getElementById(`frame-${windowId}`);
+      const content = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>${program.css}</style>
+          </head>
+          <body>
+            ${program.html}
+            <script>${program.js}<\/script>
+          </body>
+        </html>
+      `;
+      iframe.srcdoc = content;
+
+      if (program.maximized) {
+        setTimeout(() => {
+          const progWindow = document.getElementById(windowId);
+          progWindow.classList.add('maximized');
+          maximizeWindow(windowId);
+        }, 100);
+      }
+    }
+    
+    openWindow(windowId);
+  }
+
+  function updateStartMenu() {
+    const startMenu = document.getElementById('startMenu');
+    
+    const existingPrograms = startMenu.querySelectorAll('.installed-program');
+    existingPrograms.forEach(prog => prog.remove());
+    
+    installedPrograms.forEach(program => {
+      const menuItem = document.createElement('div');
+      menuItem.className = 'start-menu-item installed-program';
+      menuItem.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="white">
+          <path d="${program.iconPath || iconPaths.app}"/>
+        </svg>
+        ${program.name}
+      `;
+      menuItem.onclick = (e) => {
+        if (e.button !== 2) { // Not right click
+          openInstalledProgram(program);
+          toggleStartMenu();
+        }
+      };
+      menuItem.oncontextmenu = (e) => showProgramContextMenu(e, program);
+      startMenu.insertBefore(menuItem, startMenu.querySelector('.start-menu-item:last-child'));
+    });
+  }
+
+  document.getElementById('htmlEditor').addEventListener('input', updatePreview);
+  document.getElementById('cssEditor').addEventListener('input', updatePreview);
+  document.getElementById('jsEditor').addEventListener('input', updatePreview);
+
+  let isDragging = false;
+  let currentX;
+  let currentY;
+  let initialX;
+  let initialY;
+  let xOffset = 0;
+  let yOffset = 0;
+
+  document.addEventListener('mousedown', (e) => {
+    const windowHeader = e.target.closest('.window-header');
+    const window = e.target.closest('.window');
+    
+    if (windowHeader && window && !window.classList.contains('maximized')) {
+      isDragging = true;
+      window.classList.add('dragging');
+      
+      initialX = e.clientX - xOffset;
+      initialY = e.clientY - yOffset;
+      
+      currentX = e.clientX - window.offsetLeft;
+      currentY = e.clientY - window.offsetTop;
+    }
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      
+      const window = document.querySelector('.window.dragging');
+      if (!window) return;
+      
+      const newX = e.clientX - currentX;
+      const newY = e.clientY - currentY;
+      
+      const maxX = window.parentElement.clientWidth - window.offsetWidth;
+      const maxY = window.parentElement.clientHeight - window.offsetHeight;
+      
+      const boundedX = Math.min(Math.max(0, newX), maxX);
+      const boundedY = Math.min(Math.max(0, newY), maxY);
+      
+      window.style.left = boundedX + 'px';
+      window.style.top = boundedY + 'px';
+      
+      xOffset = boundedX;
+      yOffset = boundedY;
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      const draggingWindow = document.querySelector('.window.dragging');
+      if (draggingWindow) {
+        draggingWindow.classList.remove('dragging');
+      }
+    }
+  });
+
+  document.querySelectorAll('.window-controls span').forEach(control => {
+    control.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+  });
+
+  function addResizeHandles(window) {
+    if (!window.querySelector('.resize-handle')) {
+      const positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+      positions.forEach(pos => {
+        const handle = document.createElement('div');
+        handle.className = `resize-handle ${pos}`;
+        window.appendChild(handle);
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.window').forEach(window => {
+      addResizeHandles(window);
+    });
+  });
+
+  const originalOpenInstalledProgram = window.openInstalledProgram;
+  window.openInstalledProgram = function(program) {
+    originalOpenInstalledProgram(program);
+    const windowId = `program-${program.id}`;
+    const window = document.getElementById(windowId);
+    if (window) {
+      addResizeHandles(window);
+    }
+  };
+
+  document.addEventListener('mousedown', (e) => {
+    const handle = e.target.closest('.resize-handle');
+    if (handle) {
+      const window = handle.closest('.window');
+      if (window && !window.classList.contains('maximized')) {
+        const position = Array.from(handle.classList)
+          .find(c => c.includes('-'))
+          .replace('resize-handle-', '');
+        
+        let startX = e.clientX;
+        let startY = e.clientY;
+        let startWidth = window.offsetWidth;
+        let startHeight = window.offsetHeight;
+        let startLeft = window.offsetLeft;
+        let startTop = window.offsetTop;
+        
+        const resize = (e) => {
+          e.preventDefault();
+          
+          const deltaX = e.clientX - startX;
+          const deltaY = e.clientY - startY;
+          
+          if (position.includes('right')) {
+            window.style.width = `${startWidth + deltaX}px`;
+          }
+          if (position.includes('bottom')) {
+            window.style.height = `${startHeight + deltaY}px`;
+          }
+          if (position.includes('left')) {
+            window.style.width = `${startWidth - deltaX}px`;
+            window.style.left = `${startLeft + deltaX}px`;
+          }
+          if (position.includes('top')) {
+            window.style.height = `${startHeight - deltaY}px`;
+            window.style.top = `${startTop + deltaY}px`;
+          }
+          
+          const minWidth = 300;
+          const minHeight = 200;
+          
+          if (parseInt(window.style.width) < minWidth) {
+            window.style.width = `${minWidth}px`;
+            if (position.includes('left')) {
+              window.style.left = `${startLeft + startWidth - minWidth}px`;
+            }
+          }
+          
+          if (parseInt(window.style.height) < minHeight) {
+            window.style.height = `${minHeight}px`;
+            if (position.includes('top')) {
+              window.style.top = `${startTop + startHeight - minHeight}px`;
+            }
+          }
+          
+          if (window.id === 'programCoder') {
+            updatePreview();
+          }
+        };
+        
+        const stopResize = () => {
+          document.removeEventListener('mousemove', resize);
+          document.removeEventListener('mouseup', stopResize);
+        };
+        
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
+      }
+    }
+  });
+
+  // Add calculator functions
+  let calcDisplay = '';
+
+  function appendToCalc(value) {
+    calcDisplay += value;
+    document.getElementById('calc-display').value = calcDisplay;
+  }
+
+  function clearCalc() {
+    calcDisplay = '';
+    document.getElementById('calc-display').value = calcDisplay;
+  }
+
+  function calculate() {
+    try {
+      calcDisplay = eval(calcDisplay).toString();
+      document.getElementById('calc-display').value = calcDisplay;
+    } catch (e) {
+      document.getElementById('calc-display').value = 'Error';
+      calcDisplay = '';
+    }
+  }
+
+  // Program context menu functions
+  let selectedProgram = null;
+
+  function showProgramContextMenu(e, program) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    selectedProgram = program;
+    const contextMenu = document.getElementById('programContextMenu');
+    contextMenu.style.display = 'block';
+    
+    const x = Math.min(e.clientX, window.innerWidth - contextMenu.offsetWidth);
+    const y = Math.min(e.clientY, window.innerHeight - contextMenu.offsetHeight);
+    contextMenu.style.left = x + 'px';
+    contextMenu.style.top = y + 'px';
+
+    // Only show uninstall for installed programs
+    const uninstallOption = contextMenu.querySelector('.uninstall-option');
+    if (installedPrograms.some(p => p.id === program.id)) {
+      uninstallOption.style.display = 'flex';
+    } else {
+      uninstallOption.style.display = 'none';
+    }
+  }
+
+  function pinProgramToDesktop() {
+    if (!selectedProgram) return;
+    
+    const desktopPath = '/home/user/Desktop';
+    const shortcutName = `${selectedProgram.name}.program`;
+    
+    // Create program shortcut in filesystem
+    createFile(desktopPath, shortcutName, 'program-shortcut');
+    const shortcut = fileSystem[desktopPath].find(f => f.name === shortcutName);
+    if (shortcut) {
+      shortcut.program = selectedProgram;
+    }
+    
+    updateDesktopIcons();
+    document.getElementById('programContextMenu').style.display = 'none';
+    selectedProgram = null;
+  }
+
+  function uninstallProgramFromMenu() {
+    if (!selectedProgram) return;
+    uninstallProgram(selectedProgram.id);
+    document.getElementById('programContextMenu').style.display = 'none';
+    selectedProgram = null;
+  }
+  
+  function selectCustomImage() {
+    const input = document.getElementById('customImageInput');
+    input.click();
+  }
+
+  async function handleCustomImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Create canvas to convert image to SVG path
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Set canvas size to 24x24 to match SVG viewBox
+      canvas.width = 24;
+      canvas.height = 24;
+      
+      // Draw and scale image to fit canvas
+      ctx.drawImage(img, 0, 0, 24, 24);
+      
+      // Get image data
+      const imageData = ctx.getImageData(0, 0, 24, 24);
+      const data = imageData.data;
+      
+      // Create SVG path from image data
+      let path = '';
+      for (let y = 0; y < 24; y++) {
+        for (let x = 0; x < 24; x++) {
+          const idx = (y * 24 + x) * 4;
+          if (data[idx + 3] > 128) { // If pixel is visible (alpha > 0.5)
+            path += `M${x},${y}h1v1h-1z`;
+          }
+        }
+      }
+      
+      // Update icon preview and current path
+      currentIconPath = path;
+      document.getElementById('selectedIcon').innerHTML = `<path d="${path}"/>`;
+      
+      // Cleanup
+      URL.revokeObjectURL(img.src);
+    };
+    
+    img.src = URL.createObjectURL(file);
+  }
+  
+  document.getElementById('customImageInput').addEventListener('change', handleCustomImageUpload);
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const currentTheme = document.body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+  });
+
+  function showNotification(message, duration = 3000) {
+    const container = document.getElementById('notificationContainer');
+    const notification = document.createElement('div');
+    notification.style.background = 'var(--taskbar-bg)';
+    notification.style.padding = '10px';
+    notification.style.marginBottom = '5px';
+    notification.style.borderRadius = '5px';
+    notification.style.color = 'var(--text)';
+    notification.innerHTML = message;
+
+    if (container.childElementCount === 5) {
+      container.removeChild(container.firstChild);
+    }
+
+    container.appendChild(notification);
+    setTimeout(() => {
+      container.removeChild(notification);
+    }, duration);
+  }
+  </script>
+</body>
+</html>
