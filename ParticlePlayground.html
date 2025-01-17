@@ -1,0 +1,191 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Physics Simulator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+  <div class="controls" id="controls-panel">
+    <div class="controls-header">
+      <button id="minimize-btn">−</button>
+      <span class="controls-title">Particle Physics Lab</span>
+    </div>
+    
+    <!-- New Info Section -->
+    <div class="info-section" id="info-section">
+      <div class="info-header">
+        <span class="info-title">Quick Start Guide</span>
+        <button id="info-minimize-btn">−</button>
+      </div>
+      <div class="info-content">
+        <p>🔹 Press <strong>R</strong> to spawn an interactive circle</p>
+        <p>🔹 You can scroll down the GUI to explore more options</p>
+        <p>🔹 Interact with particles using different modes</p>
+        <p>🔹 If something doesn't work, try to clear all and reset system if it still doesnt work report the bug in my discord</p>
+        <p>🔹 you can minimize the GUI by pressing the minus next to the GUI title</p>
+      </div>
+    </div>
+
+    <div class="controls-content">
+      <div class="settings-group">
+        <div class="settings-group-title">Spawn Objects</div>
+        <div class="spawn-buttons">
+          <button id="spawn-circle" class="spawn-btn tooltip">
+            ● Circle
+            <span class="tooltip-text">Spawn a circular object</span>
+          </button>
+          <button id="spawn-square" class="spawn-btn tooltip">
+            ■ Square
+            <span class="tooltip-text">Spawn a square object</span>
+          </button>
+          <button id="spawn-triangle" class="spawn-btn tooltip">
+            ▲ Triangle
+            <span class="tooltip-text">Spawn a triangle object</span>
+          </button>
+        </div>
+        <label class="tooltip">
+          Object Size: <span class="parameter-value" id="spawn-size-value">20px</span>
+          <span class="tooltip-text">Set the size of spawned objects</span>
+          <input type="range" id="spawn-size" min="10" max="100" value="20">
+        </label>
+        <label class="tooltip">
+          Object Mass: <span class="parameter-value" id="spawn-mass-value">1.0</span>
+          <span class="tooltip-text">Set the mass of spawned objects</span>
+          <input type="range" id="spawn-mass" min="0.1" max="5" value="1" step="0.1">
+        </label>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title">Core Settings</div>
+        <div class="spawn-buttons">
+          <button id="reset-btn" class="tooltip">
+            Reset System
+            <span class="tooltip-text">Reset all particles to their initial state</span>
+          </button>
+          <button id="clear-particles-btn" class="tooltip">
+            Clear All
+            <span class="tooltip-text">Remove all particles and objects from the system</span>
+          </button>
+        </div>
+        <label class="tooltip">
+          Particle Count: <span class="parameter-value" id="particle-count-value">100</span>
+          <span class="tooltip-text">Adjust the number of particles in the system</span>
+          <input type="range" id="particle-count" min="10" max="500" value="100">
+        </label>
+         <label class="tooltip">
+            Particle Mass: <span class="parameter-value" id="particle-mass-value">1.0</span>
+            <span class="tooltip-text">Adjust the mass of particles</span>
+            <input type="range" id="particle-mass" min="0.1" max="5" value="1" step="0.1">
+          </label>
+        <label class="tooltip">
+          Simulation Speed: <span class="parameter-value" id="simulation-speed-value">1.0x</span>
+          <span class="tooltip-text">Control the overall speed of the simulation</span>
+          <input type="range" id="simulation-speed" min="0.1" max="2" value="1" step="0.1">
+        </label>
+         <label class="tooltip">
+            Gravity: <span class="parameter-value" id="gravity-toggle-value">On</span>
+            <span class="tooltip-text">Toggle gravity on particles</span>
+            <input type="checkbox" id="gravity-toggle" checked>
+          </label>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Particle Properties</div>
+        <label class="tooltip">
+          Particle Type:
+          <select id="particle-type">
+            <option value="plasma">Plasma </option>
+            <option value="electric">Electric </option>
+            <option value="organic">Organic </option>
+            <option value="cosmic">Cosmic </option>
+            <option value="quantum">Quantum </option>
+            <option value="magnetic">Magnetic </option>
+          </select>
+        </label>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Interaction Controls</div>
+        <label class="tooltip">
+          Interaction Mode:
+          <select id="interaction-mode">
+            <option value="attract">Gravitational Pull</option>
+            <option value="repel">Force Field</option>
+            <option value="swirl">Vortex</option>
+            <option value="scatter">Chaos Burst</option>
+            <option value="gravitate">Black Hole</option>
+            <option value="pulse">Energy Wave</option>
+            <option value="explode">Supernova</option>
+            <option value="connect">Particle Connecter</option>
+             <option value="merge">Color changer</option>
+            <option value="none">Observer Mode</option>
+          </select>
+        </label>
+        
+        <label class="tooltip">
+          Interaction Strength: <span class="parameter-value" id="interaction-strength-value">5</span>
+          <span class="tooltip-text">Control the intensity of particle interactions</span>
+          <input type="range" id="interaction-strength" min="0" max="20" value="5" step="0.5">
+        </label>
+        
+        <label class="tooltip">
+          Interaction Radius: <span class="parameter-value" id="interaction-radius-value">100px</span>
+          <span class="tooltip-text">Set the range of influence</span>
+          <input type="range" id="interaction-radius" min="50" max="500" value="100">
+        </label>
+        
+        <label class="tooltip">
+          Connection Radius: <span class="parameter-value" id="connection-radius-value">100px</span>
+          <span class="tooltip-text">Distance threshold for particle connections</span>
+          <input type="range" id="connection-radius" min="10" max="300" value="100">
+        </label>
+      </div>
+    </div>
+  </div>
+  <div id="fps-counter">FPS: 60</div>
+  
+  <div class="overlay" id="overlay"></div>
+  <div class="popup-menu" id="circle-popup">
+    <h2>Spawn Interactive Circle</h2>
+    <div class="settings-group">
+      <label>
+        Interaction Type:
+        <select id="popup-interaction-mode">
+          <option value="attract">Gravitational Pull</option>
+          <option value="repel">Force Field</option>
+          <option value="swirl">Vortex</option>
+          <option value="scatter">Chaos Burst</option>
+          <option value="gravitate">Black Hole</option>
+          <option value="pulse">Energy Wave</option>
+          <option value="explode">Supernova</option>
+           <option value="merge">Color changer</option>
+        </select>
+      </label>
+      
+      <label>
+        Interaction Strength:
+        <span class="parameter-value" id="popup-strength-value">5</span>
+        <input type="range" id="popup-strength" min="0" max="20" value="5" step="0.5">
+      </label>
+      
+      <label>
+        Interaction Radius:
+        <span class="parameter-value" id="popup-radius-value">100px</span>
+        <input type="range" id="popup-radius" min="50" max="500" value="100">
+      </label>
+
+      <label>
+        <input type="checkbox" id="popup-physics-toggle" checked>
+        Enable Physics
+      </label>
+    </div>
+    <div class="popup-buttons">
+      <button id="spawn-circle-btn">Spawn Circle</button>
+      <button id="cancel-circle-btn">Cancel</button>
+    </div>
+  </div>
+
+  <script type="module" src="particles.js"></script>
+</body>
+</html>
