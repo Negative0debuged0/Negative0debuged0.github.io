@@ -79,65 +79,111 @@
   playersContainer.id = 'external-players';
   document.body.appendChild(playersContainer);
 
-  // Load Gun.js
-  const gunScript = document.createElement('script');
-  gunScript.src = 'https://cdn.jsdelivr.net/npm/gun/gun.js';
-  gunScript.onload = initializePlayers;
-  document.head.appendChild(gunScript);
-
-  function initializePlayers() {
-    const gun = Gun({
-      peers: ['https://gun-manhattan.herokuapp.com/gun']
-    });
-
-    function createExternalPlayer(id) {
-      const player = document.createElement('div');
-      player.className = 'external-player';
-      player.id = `external-player-${id}`;
-      
-      const body = document.createElement('div');
-      body.className = 'body';
-      
-      const parts = ['core', 'arm-left', 'arm-right', 'leg-left', 'leg-right'];
-      parts.forEach(part => {
-        const element = document.createElement('div');
-        element.className = `part ${part}`;
-        body.appendChild(element);
-      });
-      
-      player.appendChild(body);
-      return player;
-    }
-
-    function updateExternalPlayer(id, data) {
-      if (!data || data.site !== window.location.href) {
-        const existingPlayer = document.getElementById(`external-player-${id}`);
-        if (existingPlayer) {
-          existingPlayer.remove();
-        }
+  // Load Gun.js with retry mechanism
+  function loadGunWithRetry(retries = 3) {
+    return new Promise((resolve, reject) => {
+      if (window.Gun) {
+        resolve(window.Gun);
         return;
       }
-      
-      let playerEl = document.getElementById(`external-player-${id}`);
-      
-      if (!playerEl) {
-        playerEl = createExternalPlayer(id);
-        playersContainer.appendChild(playerEl);
-      }
-      
-      playerEl.style.transform = `translate(${data.x}px, ${data.y}px)`;
-      if (data.transformed) {
-        playerEl.classList.add('transformed');
-      } else {
-        playerEl.classList.remove('transformed');
-      }
-    }
 
-    // Subscribe to player updates
-    gun.get('players').map().on((data, id) => {
-      if (data) {
-        updateExternalPlayer(id, data);
-      }
+      const gunScript = document.createElement('script');
+      gunScript.src = 'https://cdn.jsdelivr.net/npm/gun/gun.js';
+      
+      gunScript.onload = () => {
+        if (window.Gun) {
+          resolve(window.Gun);
+        } else {
+          reject(new Error('Gun not found after script load'));
+        }
+      };
+
+      gunScript.onerror = () => {
+        if (retries > 0) {
+          console.log('Retrying Gun.js load...');
+          setTimeout(() => {
+            loadGunWithRetry(retries - 1).then(resolve).catch(reject);
+          }, 1000);
+        } else {
+          reject(new Error('Failed to load Gun.js'));
+        }
+      };
+
+      document.head.appendChild(gunScript);
     });
   }
+
+  // Initialize players with error handling
+  async function initializePlayers() {
+    try {
+      await loadGunWithRetry();
+      
+      const gun = new Gun({
+        peers: [
+          'https://gun-manhattan.herokuapp.com/gun',
+          'https://gun-us.herokuapp.com/gun'
+        ]
+      });
+
+      function createExternalPlayer(id) {
+        const player = document.createElement('div');
+        player.className = 'external-player';
+        player.id = `external-player-${id}`;
+        
+        const body = document.createElement('div');
+        body.className = 'body';
+        
+        const parts = ['core', 'arm-left', 'arm-right', 'leg-left', 'leg-right'];
+        parts.forEach(part => {
+          const element = document.createElement('div');
+          element.className = `part ${part}`;
+          body.appendChild(element);
+        });
+        
+        player.appendChild(body);
+        return player;
+      }
+
+      function updateExternalPlayer(id, data) {
+        if (!data || !data.site || data.site !== window.location.href) {
+          const existingPlayer = document.getElementById(`external-player-${id}`);
+          if (existingPlayer) {
+            existingPlayer.remove();
+          }
+          return;
+        }
+        
+        let playerEl = document.getElementById(`external-player-${id}`);
+        
+        if (!playerEl) {
+          playerEl = createExternalPlayer(id);
+          playersContainer.appendChild(playerEl);
+        }
+        
+        playerEl.style.transform = `translate(${data.x}px, ${data.y}px)`;
+        if (data.transformed) {
+          playerEl.classList.add('transformed');
+        } else {
+          playerEl.classList.remove('transformed');
+        }
+      }
+
+      // Subscribe to player updates with error handling
+      gun.get('players').map().on((data, id) => {
+        try {
+          if (data) {
+            updateExternalPlayer(id, data);
+          }
+        } catch (error) {
+          console.error('Error updating external player:', error);
+        }
+      });
+
+    } catch (error) {
+      console.error('Failed to initialize players:', error);
+    }
+  }
+
+  // Start initialization
+  initializePlayers();
 })();
