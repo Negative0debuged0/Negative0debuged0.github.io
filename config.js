@@ -41,6 +41,12 @@ export default {
             description: "An interactive physics simulation platform for exploring realistic object interactions.",
             link: "https://negative0debuged0.github.io/PhysicsSandbox",
             thumbnail: "/2025-03-25_19-46.png"
+        },
+          {
+            title: "Bookmarklets",
+            description: "Some bookmarklets i made please note that these may not work on all websites and may be buggy ",
+            link: "https://negative0debuged0.github.io/Bookmarklets/",
+            thumbnail: ""
         }
     ],
     
