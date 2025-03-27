@@ -1,9 +1,11 @@
-// Configuration for the website
-import config from './config.js';
+// Main website script with import map approach
+import { createCustomCursor, toggleCursor } from './cursor.js';
 import { initOptions, toggleOption } from './options.js';
-import { createCustomCursor } from './cursor.js';
-import { initColorPicker } from './colorPicker.js';
+import { updateParticleSettings, updateAnimationSettings } from './particles.js';
+import { initColorPicker, updateAccentColor } from './colorPicker.js';
+import { applyTheme, saveOptions, loadOptions } from './themes.js';
 import { initComments } from './comments.js';
+import config from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Apply any dynamic configurations
