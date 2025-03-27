@@ -1,4 +1,4 @@
-/* Shared styles between main site and ButtonHoverEffects */
+/* Shared styles between main site and all sub-pages */
 :root {
     --main-bg-color: #000000;
     --card-bg-color: #0a0a0a;
@@ -10,6 +10,7 @@
     --glitch-color1: #0ff;
     --glitch-color2: #f0f;
     --animation-intensity: 1;
+    --secondary-color: var(--accent-color);
 }
 
 * {
@@ -36,6 +37,17 @@ header {
     border-bottom: 1px solid var(--accent-color);
 }
 
+header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    animation: header-glow 3s infinite;
+}
+
 footer {
     background-color: var(--header-bg-color);
     text-align: center;
@@ -56,4 +68,201 @@ p, h1, h2, h3, h4, h5, h6, span, li {
 
 a, button, .hover-btn, .flipper, #options-button, .close-popup, .close-options {
     cursor: none !important;
+}
+
+/* Options Button */
+#options-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--accent-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    cursor: none !important;
+}
+
+/* Options Popup Styles */
+.options-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+}
+
+.options-popup.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.options-content {
+    background-color: var(--card-bg-color);
+    border-radius: 10px;
+    padding: 2rem;
+    width: 400px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--card-border-color);
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.4s ease;
+}
+
+.options-popup.active .options-content {
+    transform: translateY(0);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Custom cursor */
+.cursor-svg {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    z-index: 10001;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+}
+
+.cursor-svg svg {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes pulse {
+    0% { 
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(1.2);
+        opacity: 0.5;
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+.cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid var(--accent-color);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: width 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28), 
+                height 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28), 
+                background-color 0.2s ease, 
+                border-radius 0.2s ease,
+                opacity 0.2s ease;
+    will-change: transform;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+.cursor-dot {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    pointer-events: none;
+    z-index: 10000;
+    transition: opacity 0.3s;
+    box-shadow: 0 0 5px var(--accent-color);
+    will-change: transform;
+    transform: translate(-50%, -50%);
+}
+
+/* Common animations */
+@keyframes header-glow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+@keyframes sonarEffect {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0; transform: scale(3); }
+}
+
+@keyframes echoEffect {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@keyframes snakeBorder {
+    0% { width: 0; height: 2px; top: 0; left: 0; }
+    25% { width: 100%; height: 2px; top: 0; left: 0; }
+    50% { width: 2px; height: 100%; top: 0; left: calc(100% - 2px); }
+    75% { width: 100%; height: 2px; top: calc(100% - 2px); left: 0; }
+    100% { width: 2px; height: 100%; top: 0; left: 0; }
 }
