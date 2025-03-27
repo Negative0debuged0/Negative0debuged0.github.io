@@ -47,6 +47,12 @@ export default {
             description: "Some bookmarklets i made please note that these may not work on all websites and may be buggy ",
             link: "https://negative0debuged0.github.io/Bookmarklets/",
             thumbnail: ""
+        },
+          {
+            title: "Bookmarklets",
+            description: "Some bookmarklets i made please note that these may not work on all websites and may be buggy ",
+            link: "https://negative0debuged0.github.io/Bookmarklets/",
+            thumbnail: ""
         }
     ],
     
