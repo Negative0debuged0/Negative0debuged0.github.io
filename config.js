@@ -42,17 +42,17 @@ export default {
             link: "https://negative0debuged0.github.io/PhysicsSandbox",
             thumbnail: "/2025-03-25_19-46.png"
         },
-          {
-            title: "Bookmarklets",
-            description: "Some bookmarklets i made please note that these may not work on all websites and may be buggy ",
-            link: "https://negative0debuged0.github.io/Bookmarklets/",
-            thumbnail: ""
+        {
+            title: "Music Visualizer",
+            description: "Interactive audio visualizer that transforms music from file uploads or microphone input into stunning visual displays.",
+            link: "MusicVisualizer/index.html",
+            thumbnail: null
         },
-          {
+        {
             title: "Bookmarklets",
-            description: "Some bookmarklets i made please note that these may not work on all websites and may be buggy ",
+            description: "Some bookmarklets I made. Please note that these may not work on all websites and may be buggy.",
             link: "https://negative0debuged0.github.io/Bookmarklets/",
-            thumbnail: ""
+            thumbnail: null
         }
     ],
     
