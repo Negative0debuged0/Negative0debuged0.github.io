@@ -53,6 +53,12 @@ export default {
             description: "Some bookmarklets I made. Please note that these may not work on all websites and may be buggy.",
             link: "https://negative0debuged0.github.io/Bookmarklets/",
             thumbnail: null
+        },
+        {
+            title: "Face Mesh",
+            description: "Face Meshes. please note that this may lag on some devices.",
+            link: "https://negative0debuged0.github.io/FaceMesh/",
+            thumbnail: null
         }
     ],
     
