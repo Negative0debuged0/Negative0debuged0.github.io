@@ -58,7 +58,7 @@ export default {
             title: "Face Mesh",
             description: "Face Meshes. please note that this may lag on some devices.",
             link: "https://negative0debuged0.github.io/FaceMesh/",
-            thumbnail: null
+            thumbnail: "/2025-06-19_19-43.png"
         }
     ],
     
