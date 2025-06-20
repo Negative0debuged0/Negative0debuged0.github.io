@@ -1,0 +1,34 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descent into Chaos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="container">
+        <section class="section" id="section-0">
+            <h1>Order</h1>
+            <p>Everything is calm and structured here.</p>
+        </section>
+        <div id="boss-fight" class="boss-fight hidden">
+            <div id="boss-entity" class="boss-entity">
+                <div class="boss-core"></div>
+                <div class="boss-arms"></div>
+            </div>
+            <div id="crosshair" class="crosshair"></div>
+            <div id="boss-ui" class="boss-ui">
+                <div class="boss-health-bar">
+                    <div id="boss-health" class="boss-health"></div>
+                </div>
+                <div class="boss-text">THE CHAOS ENTITY</div>
+                <div class="instruction-text">CLICK TO SHOOT STABILIZING ORBS</div>
+            </div>
+            <div id="orbs-container" class="orbs-container"></div>
+            <div id="corruption-overlay" class="corruption-overlay"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
