@@ -65,6 +65,12 @@ export default {
             description: "Just Scroll down",
             link: "https://negative0debuged0.github.io/Scroll/",
             thumbnail: null
+        },
+        {
+            title: "Dreamstatic",
+            description: "Dreamstatic is a band created by NegativeZer0 and his friend Vadimus",
+            link: "https://negative0debuged0.github.io/DreamStatic/",
+            thumbnail: null
         }
     ],
     
